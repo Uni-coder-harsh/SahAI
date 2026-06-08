@@ -1,5 +1,5 @@
 import pytest
-from src.math_engine import (
+from models.bayesian_network import (
     calculate_variance,
     apply_ebbinghaus_decay,
     calculate_expected_mastery,
