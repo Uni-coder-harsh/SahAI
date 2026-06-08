@@ -1,0 +1,12 @@
+[submodule "services/api-node"]
+	path = services/api-node
+	url = git@github.com:Uni-coder-harsh/sahai-api-node.git
+[submodule "services/ml-training"]
+	path = services/ml-training
+	url = git@github.com:Uni-coder-harsh/sahai-ml-training.git
+[submodule "services/engine-python"]
+	path = services/engine-python
+	url = git@github.com:Uni-coder-harsh/sahai-engine-python.git
+[submodule "clients/flutter"]
+	path = clients/flutter
+	url = git@github.com:Uni-coder-harsh/sahai-client-flutter.git
