@@ -75,6 +75,47 @@ CREATE INDEX IF NOT EXISTS idx_cognitive_user ON user_cognitive_states(user_id);
 -- SEED DATA SETUP
 -- ==========================================
 
+-- Question Bank Schema Setup
+CREATE TABLE IF NOT EXISTS questions (
+    id UUID PRIMARY KEY,
+    question_text TEXT NOT NULL,
+    correct_option_id UUID,                 -- Set as foreign key after options table
+    difficulty_level DECIMAL(5,4) NOT NULL, -- 0.1 (easy) to 1.0 (hard)
+    expected_time INT DEFAULT 60,           -- in seconds
+    is_initial_test BOOLEAN DEFAULT FALSE,   -- diagnostic test question
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS options (
+    id UUID PRIMARY KEY,
+    question_id UUID REFERENCES questions(id) ON DELETE CASCADE,
+    option_letter CHAR(1) NOT NULL,         -- 'A', 'B', 'C', 'D'
+    option_text TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Complete circular foreign key reference
+ALTER TABLE questions 
+DROP CONSTRAINT IF EXISTS fk_correct_option;
+
+ALTER TABLE questions
+ADD CONSTRAINT fk_correct_option 
+FOREIGN KEY (correct_option_id) REFERENCES options(id) ON DELETE SET NULL;
+
+CREATE TABLE IF NOT EXISTS question_concept_links (
+    question_id UUID REFERENCES questions(id) ON DELETE CASCADE,
+    node_id VARCHAR(100) REFERENCES concept_nodes(node_id) ON DELETE CASCADE,
+    weight DECIMAL(5,4) NOT NULL,           -- How strongly correct answer represents concept mastery
+    PRIMARY KEY (question_id, node_id)
+);
+
+CREATE TABLE IF NOT EXISTS option_concept_misconceptions (
+    option_id UUID REFERENCES options(id) ON DELETE CASCADE,
+    node_id VARCHAR(100) REFERENCES concept_nodes(node_id) ON DELETE CASCADE,
+    weight DECIMAL(5,4) NOT NULL,           -- Weight of misunderstanding this concept if chosen
+    PRIMARY KEY (option_id, node_id)
+);
+
 -- 6. Student Question Performance Logs
 CREATE TABLE IF NOT EXISTS user_question_responses (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

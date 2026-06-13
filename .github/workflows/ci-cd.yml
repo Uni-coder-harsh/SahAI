@@ -23,6 +23,7 @@ jobs:
         path: ./
         base: ""
         head: HEAD
+        extra_args: --only-verified
 
     # 1. Setup Node Environment and Test
     - name: Set up Node.js
@@ -93,3 +94,13 @@ jobs:
         tags: |
           ${{ secrets.DOCKER_USERNAME }}/sahai-engine-python:latest
           ${{ secrets.DOCKER_USERNAME }}/sahai-engine-python:${{ github.sha }}
+
+    # Build and push ML Training image
+    - name: Build and Push ML Training Image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./services/ml-training
+        push: true
+        tags: |
+          ${{ secrets.DOCKER_USERNAME }}/sahai-ml-training:latest
+          ${{ secrets.DOCKER_USERNAME }}/sahai-ml-training:${{ github.sha }}

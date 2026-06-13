@@ -1,4 +1,5 @@
 import os
+import sys
 import psycopg2
 from pathlib import Path
 from dotenv import load_dotenv
@@ -27,6 +28,26 @@ def connect_postgres():
         kwargs["sslmode"] = "require"
     return psycopg2.connect(**kwargs)
 
+def drop_all_tables(cur):
+    print("[Schema Exec] Dropping all existing tables to start fresh...")
+    cur.execute(
+        """
+        DROP TABLE IF EXISTS user_question_responses CASCADE;
+        DROP TABLE IF EXISTS option_concept_misconceptions CASCADE;
+        DROP TABLE IF EXISTS question_concept_links CASCADE;
+        DROP TABLE IF EXISTS options CASCADE;
+        DROP TABLE IF EXISTS questions CASCADE;
+        DROP TABLE IF EXISTS user_concept_correlations CASCADE;
+        DROP TABLE IF EXISTS concept_correlations CASCADE;
+        DROP TABLE IF EXISTS user_cognitive_states CASCADE;
+        DROP TABLE IF EXISTS advanced_dag_edges CASCADE;
+        DROP TABLE IF EXISTS concept_nodes CASCADE;
+        DROP TABLE IF EXISTS users CASCADE;
+        DROP TABLE IF EXISTS institutions CASCADE;
+        """
+    )
+    print("[Schema Exec] All tables dropped successfully.")
+
 def main():
     print("[Schema Exec] Connecting to database...")
     conn = connect_postgres()
@@ -34,6 +55,9 @@ def main():
     cur = conn.cursor()
     
     try:
+        if "--drop" in sys.argv:
+            drop_all_tables(cur)
+            
         # 1. Read and execute init.sql
         init_sql_path = root_dir / "init-db" / "init.sql"
         print(f"[Schema Exec] Executing {init_sql_path}...")
