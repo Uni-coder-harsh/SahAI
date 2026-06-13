@@ -1,0 +1,1974 @@
+[
+  {
+    "question_id": "PY_Q_001",
+    "difficulty": 0.18,
+    "concept_coverage": [
+      {"node_id": "PY_SYNTAX_05", "weight": 0.6},
+      {"node_id": "PY_DATA_06", "weight": 0.4}
+    ],
+    "q_text": "What is the value of x after executing: x = 5 + 2 * 3 ?",
+    "correct_option": "B",
+    "options": {
+      "A": {
+        "text": "21",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_DATA_06", "weight": 0.85},
+          {"node_id": "PY_SYNTAX_05", "weight": 0.35}
+        ]
+      },
+      "B": {
+        "text": "11",
+        "is_correct": true
+      },
+      "C": {
+        "text": "15",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_DATA_06", "weight": 0.75}
+        ]
+      },
+      "D": {
+        "text": "7",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_DATA_01", "weight": 0.45},
+          {"node_id": "PY_DATA_06", "weight": 0.60}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_002",
+    "difficulty": 0.22,
+    "concept_coverage": [
+      {"node_id": "PY_STRING_01", "weight": 0.55},
+      {"node_id": "PY_STRING_02", "weight": 0.45}
+    ],
+    "q_text": "What is the output of 'Python'[1:4] ?",
+    "correct_option": "C",
+    "options": {
+      "A": {
+        "text": "Pyt",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_STRING_02", "weight": 0.80}
+        ]
+      },
+      "B": {
+        "text": "ytho",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_STRING_01", "weight": 0.65},
+          {"node_id": "PY_STRING_02", "weight": 0.70}
+        ]
+      },
+      "C": {
+        "text": "yth",
+        "is_correct": true
+      },
+      "D": {
+        "text": "tho",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_STRING_01", "weight": 0.85}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_003",
+    "difficulty": 0.24,
+    "concept_coverage": [
+      {"node_id": "PY_CONTROL_01", "weight": 0.65},
+      {"node_id": "PY_DATA_07", "weight": 0.35}
+    ],
+    "q_text": "What is printed?\n\nx = 10\nif x > 5:\n    print('A')\nelse:\n    print('B')",
+    "correct_option": "A",
+    "options": {
+      "A": {
+        "text": "A",
+        "is_correct": true
+      },
+      "B": {
+        "text": "B",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONTROL_01", "weight": 0.85},
+          {"node_id": "PY_DATA_07", "weight": 0.60}
+        ]
+      },
+      "C": {
+        "text": "A B",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONTROL_02", "weight": 0.75}
+        ]
+      },
+      "D": {
+        "text": "Error",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_SYNTAX_01", "weight": 0.70}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_004",
+    "difficulty": 0.28,
+    "concept_coverage": [
+      {"node_id": "PY_LIST_01", "weight": 0.5},
+      {"node_id": "PY_LIST_02", "weight": 0.5}
+    ],
+    "q_text": "What is the value of [10,20,30][1] ?",
+    "correct_option": "B",
+    "options": {
+      "A": {
+        "text": "10",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_LIST_02", "weight": 0.90},
+          {"node_id": "PY_STRING_01", "weight": 0.30}
+        ]
+      },
+      "B": {
+        "text": "20",
+        "is_correct": true
+      },
+      "C": {
+        "text": "30",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_LIST_02", "weight": 0.80}
+        ]
+      },
+      "D": {
+        "text": "Error",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_LIST_01", "weight": 0.45}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_005",
+    "difficulty": 0.30,
+    "concept_coverage": [
+      {"node_id": "PY_CONTROL_06", "weight": 0.45},
+      {"node_id": "PY_LIST_01", "weight": 0.55}
+    ],
+    "q_text": "How many times will the loop execute?\nfor i in [1,2,3,4]:\n    pass",
+    "correct_option": "D",
+    "options": {
+      "A": {
+        "text": "3",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONTROL_06", "weight": 0.70}
+        ]
+      },
+      "B": {
+        "text": "5",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONTROL_06", "weight": 0.75}
+        ]
+      },
+      "C": {
+        "text": "Infinite",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONTROL_05", "weight": 0.65},
+          {"node_id": "PY_CONTROL_06", "weight": 0.50}
+        ]
+      },
+      "D": {
+        "text": "4",
+        "is_correct": true
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_006",
+    "difficulty": 0.32,
+    "concept_coverage": [
+      {"node_id": "PY_DICT_01", "weight": 0.45},
+      {"node_id": "PY_DICT_02", "weight": 0.55}
+    ],
+    "q_text": "What is the output of {'a':1,'b':2}['b'] ?",
+    "correct_option": "C",
+    "options": {
+      "A": {
+        "text": "1",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_DICT_02", "weight": 0.88}
+        ]
+      },
+      "B": {
+        "text": "'b'",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_DICT_01", "weight": 0.50},
+          {"node_id": "PY_DICT_02", "weight": 0.75}
+        ]
+      },
+      "C": {
+        "text": "2",
+        "is_correct": true
+      },
+      "D": {
+        "text": "KeyError",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_EXC_01", "weight": 0.45},
+          {"node_id": "PY_DICT_02", "weight": 0.55}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_007",
+    "difficulty": 0.34,
+    "concept_coverage": [
+      {"node_id": "PY_FUNC_01", "weight": 0.4},
+      {"node_id": "PY_FUNC_03", "weight": 0.6}
+    ],
+    "q_text": "What is returned by the function?\n\ndef add(a,b):\n    return a+b\n\nadd(2,3)",
+    "correct_option": "A",
+    "options": {
+      "A": {
+        "text": "5",
+        "is_correct": true
+      },
+      "B": {
+        "text": "23",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_FUNC_03", "weight": 0.80},
+          {"node_id": "PY_DATA_05", "weight": 0.35}
+        ]
+      },
+      "C": {
+        "text": "None",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_FUNC_03", "weight": 0.88}
+        ]
+      },
+      "D": {
+        "text": "Error",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_FUNC_01", "weight": 0.65}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_008",
+    "difficulty": 0.36,
+    "concept_coverage": [
+      {"node_id": "PY_SCOPE_02", "weight": 0.45},
+      {"node_id": "PY_SCOPE_04", "weight": 0.55}
+    ],
+    "q_text": "What is printed?\n\nx = 100\n\ndef f():\n    print(x)\n\nf()",
+    "correct_option": "B",
+    "options": {
+      "A": {
+        "text": "Error",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_SCOPE_04", "weight": 0.92},
+          {"node_id": "PY_SCOPE_02", "weight": 0.65}
+        ]
+      },
+      "B": {
+        "text": "100",
+        "is_correct": true
+      },
+      "C": {
+        "text": "None",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_FUNC_03", "weight": 0.55},
+          {"node_id": "PY_SCOPE_04", "weight": 0.65}
+        ]
+      },
+      "D": {
+        "text": "0",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_SCOPE_02", "weight": 0.60}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_009",
+    "difficulty": 0.38,
+    "concept_coverage": [
+      {"node_id": "PY_LIST_06", "weight": 0.6},
+      {"node_id": "PY_CONTROL_06", "weight": 0.4}
+    ],
+    "q_text": "What is the output of [x for x in range(3)] ?",
+    "correct_option": "D",
+    "options": {
+      "A": {
+        "text": "[1,2,3]",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_LIST_06", "weight": 0.88},
+          {"node_id": "PY_CONTROL_06", "weight": 0.50}
+        ]
+      },
+      "B": {
+        "text": "(0,1,2)",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_TUPLE_01", "weight": 0.80},
+          {"node_id": "PY_LIST_01", "weight": 0.45}
+        ]
+      },
+      "C": {
+        "text": "[0,1,2,3]",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONTROL_06", "weight": 0.85}
+        ]
+      },
+      "D": {
+        "text": "[0,1,2]",
+        "is_correct": true
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_010",
+    "difficulty": 0.40,
+    "concept_coverage": [
+      {"node_id": "PY_FUNC_04", "weight": 0.4},
+      {"node_id": "PY_FUNC_02", "weight": 0.3},
+      {"node_id": "PY_FUNC_03", "weight": 0.3}
+    ],
+    "q_text": "What is the output?\n\ndef greet(name='World'):\n    return name\n\nprint(greet())",
+    "correct_option": "C",
+    "options": {
+      "A": {
+        "text": "None",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_FUNC_03", "weight": 0.85}
+        ]
+      },
+      "B": {
+        "text": "Error",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_FUNC_04", "weight": 0.90},
+          {"node_id": "PY_FUNC_02", "weight": 0.55}
+        ]
+      },
+      "C": {
+        "text": "World",
+        "is_correct": true
+      },
+      "D": {
+        "text": "'World'",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_STRING_01", "weight": 0.45},
+          {"node_id": "PY_FUNC_03", "weight": 0.35}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_011",
+    "difficulty": 0.42,
+    "concept_coverage": [
+      {"node_id": "PY_LIST_07", "weight": 0.65},
+      {"node_id": "PY_CONTROL_01", "weight": 0.35}
+    ],
+    "q_text": "What is the output of [x for x in range(6) if x % 2 == 0]?",
+    "correct_option": "B",
+    "options": {
+      "A": {
+        "text": "[1,3,5]",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_LIST_07", "weight": 0.85},
+          {"node_id": "PY_CONTROL_01", "weight": 0.60}
+        ]
+      },
+      "B": {
+        "text": "[0,2,4]",
+        "is_correct": true
+      },
+      "C": {
+        "text": "[2,4,6]",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONTROL_06", "weight": 0.75},
+          {"node_id": "PY_LIST_07", "weight": 0.55}
+        ]
+      },
+      "D": {
+        "text": "[0,1,2,3,4,5]",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_LIST_07", "weight": 0.90}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_012",
+    "difficulty": 0.44,
+    "concept_coverage": [
+      {"node_id": "PY_TUPLE_03", "weight": 0.70},
+      {"node_id": "PY_TUPLE_02", "weight": 0.30}
+    ],
+    "q_text": "What are the values of a and b after: a, b = (10, 20)?",
+    "correct_option": "A",
+    "options": {
+      "A": {
+        "text": "a=10, b=20",
+        "is_correct": true
+      },
+      "B": {
+        "text": "a=(10,20), b=None",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_TUPLE_03", "weight": 0.88},
+          {"node_id": "PY_TUPLE_01", "weight": 0.45}
+        ]
+      },
+      "C": {
+        "text": "a=20, b=10",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_TUPLE_03", "weight": 0.72}
+        ]
+      },
+      "D": {
+        "text": "Raises ValueError",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_TUPLE_03", "weight": 0.80},
+          {"node_id": "PY_EXC_01", "weight": 0.30}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_013",
+    "difficulty": 0.46,
+    "concept_coverage": [
+      {"node_id": "PY_DICT_04", "weight": 0.60},
+      {"node_id": "PY_CONTROL_06", "weight": 0.40}
+    ],
+    "q_text": "What is the output of {x:x*x for x in range(3)}?",
+    "correct_option": "D",
+    "options": {
+      "A": {
+        "text": "[0,1,4]",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_DICT_04", "weight": 0.85},
+          {"node_id": "PY_LIST_06", "weight": 0.70}
+        ]
+      },
+      "B": {
+        "text": "{0,1,4}",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_SET_01", "weight": 0.80},
+          {"node_id": "PY_DICT_04", "weight": 0.65}
+        ]
+      },
+      "C": {
+        "text": "{0:0,1:1,2:2}",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_DICT_04", "weight": 0.82}
+        ]
+      },
+      "D": {
+        "text": "{0:0,1:1,2:4}",
+        "is_correct": true
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_014",
+    "difficulty": 0.48,
+    "concept_coverage": [
+      {"node_id": "PY_FUNC_06", "weight": 0.70},
+      {"node_id": "PY_FUNC_02", "weight": 0.30}
+    ],
+    "q_text": "What is the value of args inside f(*args) when called as f(1,2,3)?",
+    "correct_option": "C",
+    "options": {
+      "A": {
+        "text": "[1,2,3]",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_FUNC_06", "weight": 0.88},
+          {"node_id": "PY_LIST_01", "weight": 0.45}
+        ]
+      },
+      "B": {
+        "text": "{1,2,3}",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_FUNC_06", "weight": 0.80},
+          {"node_id": "PY_SET_01", "weight": 0.55}
+        ]
+      },
+      "C": {
+        "text": "(1,2,3)",
+        "is_correct": true
+      },
+      "D": {
+        "text": "1",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_FUNC_02", "weight": 0.65},
+          {"node_id": "PY_FUNC_06", "weight": 0.75}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_015",
+    "difficulty": 0.50,
+    "concept_coverage": [
+      {"node_id": "PY_SCOPE_03", "weight": 0.50},
+      {"node_id": "PY_SCOPE_04", "weight": 0.50}
+    ],
+    "q_text": "Which keyword allows modification of a variable in an enclosing function scope?",
+    "correct_option": "B",
+    "options": {
+      "A": {
+        "text": "global",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_SCOPE_02", "weight": 0.90},
+          {"node_id": "PY_SCOPE_03", "weight": 0.65}
+        ]
+      },
+      "B": {
+        "text": "nonlocal",
+        "is_correct": true
+      },
+      "C": {
+        "text": "local",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_SCOPE_03", "weight": 0.80}
+        ]
+      },
+      "D": {
+        "text": "static",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_SCOPE_04", "weight": 0.55},
+          {"node_id": "PY_OOP_08", "weight": 0.35}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_016",
+    "difficulty": 0.52,
+    "concept_coverage": [
+      {"node_id": "PY_FILE_05", "weight": 0.70},
+      {"node_id": "PY_FILE_01", "weight": 0.30}
+    ],
+    "q_text": "What is the primary advantage of using 'with open(...) as f'?",
+    "correct_option": "A",
+    "options": {
+      "A": {
+        "text": "The file is automatically closed",
+        "is_correct": true
+      },
+      "B": {
+        "text": "The file becomes read-only",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_FILE_05", "weight": 0.82}
+        ]
+      },
+      "C": {
+        "text": "The file is loaded entirely into memory",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_FILE_02", "weight": 0.65},
+          {"node_id": "PY_FILE_05", "weight": 0.70}
+        ]
+      },
+      "D": {
+        "text": "Exceptions are disabled",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_FILE_05", "weight": 0.75},
+          {"node_id": "PY_EXC_02", "weight": 0.45}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_017",
+    "difficulty": 0.54,
+    "concept_coverage": [
+      {"node_id": "PY_EXC_05", "weight": 0.60},
+      {"node_id": "PY_EXC_02", "weight": 0.40}
+    ],
+    "q_text": "Which statement explicitly triggers an exception?",
+    "correct_option": "D",
+    "options": {
+      "A": {
+        "text": "except",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_EXC_02", "weight": 0.88}
+        ]
+      },
+      "B": {
+        "text": "finally",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_EXC_03", "weight": 0.85}
+        ]
+      },
+      "C": {
+        "text": "assert",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_EXC_05", "weight": 0.55},
+          {"node_id": "PY_EXC_01", "weight": 0.45}
+        ]
+      },
+      "D": {
+        "text": "raise",
+        "is_correct": true
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_018",
+    "difficulty": 0.56,
+    "concept_coverage": [
+      {"node_id": "PY_OOP_05", "weight": 0.40},
+      {"node_id": "PY_OOP_06", "weight": 0.60}
+    ],
+    "q_text": "Which method is automatically invoked when a new object is created?",
+    "correct_option": "B",
+    "options": {
+      "A": {
+        "text": "__newobj__",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_05", "weight": 0.78},
+          {"node_id": "PY_OOP_15", "weight": 0.55}
+        ]
+      },
+      "B": {
+        "text": "__init__",
+        "is_correct": true
+      },
+      "C": {
+        "text": "__call__",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_15", "weight": 0.72},
+          {"node_id": "PY_OOP_05", "weight": 0.45}
+        ]
+      },
+      "D": {
+        "text": "__del__",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_05", "weight": 0.70},
+          {"node_id": "PY_MEMORY_05", "weight": 0.40}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_019",
+    "difficulty": 0.58,
+    "concept_coverage": [
+      {"node_id": "PY_OOP_09", "weight": 0.55},
+      {"node_id": "PY_OOP_10", "weight": 0.45}
+    ],
+    "q_text": "What is method overriding?",
+    "correct_option": "C",
+    "options": {
+      "A": {
+        "text": "Defining multiple methods with the same name in one class",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_12", "weight": 0.55},
+          {"node_id": "PY_OOP_10", "weight": 0.75}
+        ]
+      },
+      "B": {
+        "text": "Replacing a built-in Python function",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_03", "weight": 0.60},
+          {"node_id": "PY_OOP_10", "weight": 0.65}
+        ]
+      },
+      "C": {
+        "text": "Redefining a parent class method in a child class",
+        "is_correct": true
+      },
+      "D": {
+        "text": "Changing method arguments at runtime",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_FUNC_02", "weight": 0.50},
+          {"node_id": "PY_OOP_10", "weight": 0.80}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_020",
+    "difficulty": 0.60,
+    "concept_coverage": [
+      {"node_id": "PY_ITER_03", "weight": 0.55},
+      {"node_id": "PY_ITER_04", "weight": 0.45}
+    ],
+    "q_text": "What does the 'yield' keyword do inside a function?",
+    "correct_option": "A",
+    "options": {
+      "A": {
+        "text": "Turns the function into a generator and produces values lazily",
+        "is_correct": true
+      },
+      "B": {
+        "text": "Returns all values at once as a list",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ITER_03", "weight": 0.88},
+          {"node_id": "PY_LIST_01", "weight": 0.45}
+        ]
+      },
+      "C": {
+        "text": "Works exactly like return",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ITER_04", "weight": 0.92},
+          {"node_id": "PY_FUNC_03", "weight": 0.55}
+        ]
+      },
+      "D": {
+        "text": "Creates a thread",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONC_01", "weight": 0.72},
+          {"node_id": "PY_ITER_03", "weight": 0.55}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_021",
+    "difficulty": 0.61,
+    "concept_coverage": [
+      {"node_id": "PY_FUNC_11", "weight": 0.65},
+      {"node_id": "PY_FUNC_09", "weight": 0.35}
+    ],
+    "q_text": "What is the primary purpose of a Python decorator?",
+    "correct_option": "B",
+    "options": {
+      "A": {
+        "text": "To create inheritance relationships between functions",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_09", "weight": 0.82},
+          {"node_id": "PY_FUNC_11", "weight": 0.55}
+        ]
+      },
+      "B": {
+        "text": "To modify or extend function behavior without changing its source code",
+        "is_correct": true
+      },
+      "C": {
+        "text": "To improve execution speed by compiling functions",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_19", "weight": 0.70},
+          {"node_id": "PY_FUNC_11", "weight": 0.60}
+        ]
+      },
+      "D": {
+        "text": "To automatically convert functions into generators",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ITER_03", "weight": 0.80},
+          {"node_id": "PY_FUNC_11", "weight": 0.65}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_022",
+    "difficulty": 0.62,
+    "concept_coverage": [
+      {"node_id": "PY_FUNC_10", "weight": 0.55},
+      {"node_id": "PY_SCOPE_03", "weight": 0.45}
+    ],
+    "q_text": "A closure is best described as:",
+    "correct_option": "C",
+    "options": {
+      "A": {
+        "text": "A function that always returns another function",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_FUNC_10", "weight": 0.72},
+          {"node_id": "PY_FUNC_09", "weight": 0.50}
+        ]
+      },
+      "B": {
+        "text": "A function defined inside a class",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_06", "weight": 0.75},
+          {"node_id": "PY_FUNC_10", "weight": 0.60}
+        ]
+      },
+      "C": {
+        "text": "A nested function that remembers variables from its enclosing scope",
+        "is_correct": true
+      },
+      "D": {
+        "text": "A recursive function with memoization",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_FUNC_08", "weight": 0.70},
+          {"node_id": "PY_FUNC_10", "weight": 0.65}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_023",
+    "difficulty": 0.63,
+    "concept_coverage": [
+      {"node_id": "PY_MEMORY_02", "weight": 0.70},
+      {"node_id": "PY_MEMORY_01", "weight": 0.30}
+    ],
+    "q_text": "Which of the following Python objects is immutable?",
+    "correct_option": "D",
+    "options": {
+      "A": {
+        "text": "list",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_MEMORY_02", "weight": 0.88},
+          {"node_id": "PY_LIST_01", "weight": 0.35}
+        ]
+      },
+      "B": {
+        "text": "dict",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_MEMORY_02", "weight": 0.85},
+          {"node_id": "PY_DICT_01", "weight": 0.30}
+        ]
+      },
+      "C": {
+        "text": "set",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_MEMORY_02", "weight": 0.83},
+          {"node_id": "PY_SET_01", "weight": 0.35}
+        ]
+      },
+      "D": {
+        "text": "tuple",
+        "is_correct": true
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_024",
+    "difficulty": 0.64,
+    "concept_coverage": [
+      {"node_id": "PY_MEMORY_03", "weight": 0.50},
+      {"node_id": "PY_MEMORY_04", "weight": 0.50}
+    ],
+    "q_text": "Which statement about copy.copy() and copy.deepcopy() is correct?",
+    "correct_option": "A",
+    "options": {
+      "A": {
+        "text": "deepcopy recursively copies nested objects while copy creates a shallow copy",
+        "is_correct": true
+      },
+      "B": {
+        "text": "Both functions always behave identically",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_MEMORY_03", "weight": 0.70},
+          {"node_id": "PY_MEMORY_04", "weight": 0.88}
+        ]
+      },
+      "C": {
+        "text": "copy creates a deeper copy than deepcopy",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_MEMORY_03", "weight": 0.90},
+          {"node_id": "PY_MEMORY_04", "weight": 0.90}
+        ]
+      },
+      "D": {
+        "text": "deepcopy only works for lists",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_MEMORY_04", "weight": 0.85}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_025",
+    "difficulty": 0.65,
+    "concept_coverage": [
+      {"node_id": "PY_OOP_15", "weight": 0.60},
+      {"node_id": "PY_OOP_16", "weight": 0.40}
+    ],
+    "q_text": "Which magic method is commonly used to overload the + operator?",
+    "correct_option": "C",
+    "options": {
+      "A": {
+        "text": "__mul__",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_16", "weight": 0.82},
+          {"node_id": "PY_OOP_15", "weight": 0.50}
+        ]
+      },
+      "B": {
+        "text": "__eq__",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_15", "weight": 0.75},
+          {"node_id": "PY_OOP_16", "weight": 0.65}
+        ]
+      },
+      "C": {
+        "text": "__add__",
+        "is_correct": true
+      },
+      "D": {
+        "text": "__init__",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_05", "weight": 0.70},
+          {"node_id": "PY_OOP_16", "weight": 0.80}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_026",
+    "difficulty": 0.66,
+    "concept_coverage": [
+      {"node_id": "PY_ITER_02", "weight": 0.40},
+      {"node_id": "PY_ITER_03", "weight": 0.60}
+    ],
+    "q_text": "What happens when next() is called on a generator after it has exhausted all values?",
+    "correct_option": "D",
+    "options": {
+      "A": {
+        "text": "It returns None",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ITER_03", "weight": 0.88},
+          {"node_id": "PY_FUNC_03", "weight": 0.35}
+        ]
+      },
+      "B": {
+        "text": "It restarts iteration from the beginning",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ITER_02", "weight": 0.80},
+          {"node_id": "PY_ITER_03", "weight": 0.70}
+        ]
+      },
+      "C": {
+        "text": "It returns the last yielded value",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ITER_03", "weight": 0.78}
+        ]
+      },
+      "D": {
+        "text": "It raises StopIteration",
+        "is_correct": true
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_027",
+    "difficulty": 0.67,
+    "concept_coverage": [
+      {"node_id": "PY_TYPE_01", "weight": 0.60},
+      {"node_id": "PY_FUNC_12", "weight": 0.40}
+    ],
+    "q_text": "What is the primary purpose of Python type hints?",
+    "correct_option": "B",
+    "options": {
+      "A": {
+        "text": "To enforce types at runtime automatically",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_TYPE_01", "weight": 0.90},
+          {"node_id": "PY_FUNC_12", "weight": 0.45}
+        ]
+      },
+      "B": {
+        "text": "To improve readability and support static analysis tools",
+        "is_correct": true
+      },
+      "C": {
+        "text": "To make Python statically typed",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_TYPE_01", "weight": 0.82},
+          {"node_id": "PY_SYNTAX_07", "weight": 0.55}
+        ]
+      },
+      "D": {
+        "text": "To increase execution speed significantly",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_19", "weight": 0.70},
+          {"node_id": "PY_TYPE_01", "weight": 0.65}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_028",
+    "difficulty": 0.68,
+    "concept_coverage": [
+      {"node_id": "PY_OOP_11", "weight": 0.50},
+      {"node_id": "PY_ADV_06", "weight": 0.50}
+    ],
+    "q_text": "What determines the order in which methods are searched in multiple inheritance?",
+    "correct_option": "A",
+    "options": {
+      "A": {
+        "text": "Method Resolution Order (MRO)",
+        "is_correct": true
+      },
+      "B": {
+        "text": "Alphabetical order of parent classes",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_06", "weight": 0.88},
+          {"node_id": "PY_OOP_11", "weight": 0.60}
+        ]
+      },
+      "C": {
+        "text": "Order of method definitions",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_06", "weight": 0.82}
+        ]
+      },
+      "D": {
+        "text": "The most recently imported class",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_MODULE_01", "weight": 0.45},
+          {"node_id": "PY_ADV_06", "weight": 0.80}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_029",
+    "difficulty": 0.69,
+    "concept_coverage": [
+      {"node_id": "PY_CONC_01", "weight": 0.45},
+      {"node_id": "PY_CONC_02", "weight": 0.55}
+    ],
+    "q_text": "Why are locks used in multithreaded Python programs?",
+    "correct_option": "D",
+    "options": {
+      "A": {
+        "text": "To increase CPU clock speed",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONC_01", "weight": 0.75},
+          {"node_id": "PY_ADV_19", "weight": 0.45}
+        ]
+      },
+      "B": {
+        "text": "To create additional threads",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONC_01", "weight": 0.80}
+        ]
+      },
+      "C": {
+        "text": "To bypass the GIL",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONC_01", "weight": 0.70},
+          {"node_id": "PY_CONC_02", "weight": 0.75}
+        ]
+      },
+      "D": {
+        "text": "To prevent race conditions when accessing shared resources",
+        "is_correct": true
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_030",
+    "difficulty": 0.70,
+    "concept_coverage": [
+      {"node_id": "PY_CONC_04", "weight": 0.55},
+      {"node_id": "PY_CONC_05", "weight": 0.45}
+    ],
+    "q_text": "What does the await keyword do inside an async function?",
+    "correct_option": "C",
+    "options": {
+      "A": {
+        "text": "Creates a new operating system thread",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONC_01", "weight": 0.82},
+          {"node_id": "PY_CONC_04", "weight": 0.65}
+        ]
+      },
+      "B": {
+        "text": "Blocks the entire Python interpreter until completion",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONC_04", "weight": 0.85},
+          {"node_id": "PY_CONC_05", "weight": 0.70}
+        ]
+      },
+      "C": {
+        "text": "Suspends the coroutine until the awaited operation completes",
+        "is_correct": true
+      },
+      "D": {
+        "text": "Converts a normal function into a coroutine",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONC_05", "weight": 0.78},
+          {"node_id": "PY_CONC_04", "weight": 0.65}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_031",
+    "difficulty": 0.72,
+    "concept_coverage": [
+      {"node_id": "PY_TYPE_02", "weight": 0.60},
+      {"node_id": "PY_TYPE_01", "weight": 0.40}
+    ],
+    "q_text": "What is the purpose of Generic[T] in Python typing?",
+    "correct_option": "B",
+    "options": {
+      "A": {
+        "text": "To enforce runtime type checking automatically",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_TYPE_01", "weight": 0.85},
+          {"node_id": "PY_TYPE_02", "weight": 0.75}
+        ]
+      },
+      "B": {
+        "text": "To create reusable type-safe abstractions parameterized by type",
+        "is_correct": true
+      },
+      "C": {
+        "text": "To convert dynamic types into static types",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_TYPE_02", "weight": 0.82},
+          {"node_id": "PY_SYNTAX_07", "weight": 0.55}
+        ]
+      },
+      "D": {
+        "text": "To optimize memory allocation for containers",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_MEMORY_01", "weight": 0.50},
+          {"node_id": "PY_TYPE_02", "weight": 0.75}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_032",
+    "difficulty": 0.73,
+    "concept_coverage": [
+      {"node_id": "PY_ADV_05", "weight": 0.55},
+      {"node_id": "PY_OOP_14", "weight": 0.45}
+    ],
+    "q_text": "What is the primary role of an Abstract Base Class (ABC)?",
+    "correct_option": "D",
+    "options": {
+      "A": {
+        "text": "To improve execution speed of subclasses",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_05", "weight": 0.75},
+          {"node_id": "PY_ADV_19", "weight": 0.55}
+        ]
+      },
+      "B": {
+        "text": "To prevent inheritance",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_09", "weight": 0.70},
+          {"node_id": "PY_ADV_05", "weight": 0.80}
+        ]
+      },
+      "C": {
+        "text": "To automatically instantiate subclasses",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_05", "weight": 0.60},
+          {"node_id": "PY_ADV_05", "weight": 0.78}
+        ]
+      },
+      "D": {
+        "text": "To define required interfaces and contracts for subclasses",
+        "is_correct": true
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_033",
+    "difficulty": 0.74,
+    "concept_coverage": [
+      {"node_id": "PY_MEMORY_05", "weight": 0.60},
+      {"node_id": "PY_MEMORY_01", "weight": 0.40}
+    ],
+    "q_text": "Which statement best describes Python's garbage collector?",
+    "correct_option": "A",
+    "options": {
+      "A": {
+        "text": "It reclaims memory occupied by unreachable objects",
+        "is_correct": true
+      },
+      "B": {
+        "text": "It permanently stores unused objects on disk",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_MEMORY_05", "weight": 0.90}
+        ]
+      },
+      "C": {
+        "text": "It removes all objects after function execution",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_MEMORY_01", "weight": 0.65},
+          {"node_id": "PY_MEMORY_05", "weight": 0.85}
+        ]
+      },
+      "D": {
+        "text": "It only works for lists and dictionaries",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_MEMORY_05", "weight": 0.82}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_034",
+    "difficulty": 0.76,
+    "concept_coverage": [
+      {"node_id": "PY_ADV_13", "weight": 0.50},
+      {"node_id": "PY_ITER_02", "weight": 0.50}
+    ],
+    "q_text": "To create a custom iterator class, which method pair must typically be implemented?",
+    "correct_option": "C",
+    "options": {
+      "A": {
+        "text": "__iter__ and __len__",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_13", "weight": 0.75},
+          {"node_id": "PY_ITER_02", "weight": 0.55}
+        ]
+      },
+      "B": {
+        "text": "__getitem__ and __setitem__",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_LIST_02", "weight": 0.65},
+          {"node_id": "PY_ADV_13", "weight": 0.78}
+        ]
+      },
+      "C": {
+        "text": "__iter__ and __next__",
+        "is_correct": true
+      },
+      "D": {
+        "text": "__call__ and __yield__",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_15", "weight": 0.55},
+          {"node_id": "PY_ADV_13", "weight": 0.85}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_035",
+    "difficulty": 0.77,
+    "concept_coverage": [
+      {"node_id": "PY_ADV_07", "weight": 0.65},
+      {"node_id": "PY_OOP_03", "weight": 0.35}
+    ],
+    "q_text": "What is the primary benefit of defining __slots__ in a class?",
+    "correct_option": "B",
+    "options": {
+      "A": {
+        "text": "Automatic thread safety",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONC_02", "weight": 0.55},
+          {"node_id": "PY_ADV_07", "weight": 0.82}
+        ]
+      },
+      "B": {
+        "text": "Reduced memory usage and prevention of arbitrary attribute creation",
+        "is_correct": true
+      },
+      "C": {
+        "text": "Support for multiple inheritance only",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_11", "weight": 0.65},
+          {"node_id": "PY_ADV_07", "weight": 0.80}
+        ]
+      },
+      "D": {
+        "text": "Automatic operator overloading",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_16", "weight": 0.70},
+          {"node_id": "PY_ADV_07", "weight": 0.78}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_036",
+    "difficulty": 0.79,
+    "concept_coverage": [
+      {"node_id": "PY_CONC_03", "weight": 0.60},
+      {"node_id": "PY_CONC_01", "weight": 0.40}
+    ],
+    "q_text": "What is the primary advantage of multiprocessing over threading for CPU-bound workloads?",
+    "correct_option": "D",
+    "options": {
+      "A": {
+        "text": "Processes share memory more efficiently than threads",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONC_03", "weight": 0.82},
+          {"node_id": "PY_MEMORY_01", "weight": 0.45}
+        ]
+      },
+      "B": {
+        "text": "Processes require fewer system resources",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONC_03", "weight": 0.75}
+        ]
+      },
+      "C": {
+        "text": "Processes eliminate synchronization issues completely",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONC_02", "weight": 0.70},
+          {"node_id": "PY_CONC_03", "weight": 0.75}
+        ]
+      },
+      "D": {
+        "text": "Processes bypass the GIL by running in separate interpreter instances",
+        "is_correct": true
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_037",
+    "difficulty": 0.81,
+    "concept_coverage": [
+      {"node_id": "PY_ADV_09", "weight": 0.55},
+      {"node_id": "PY_ADV_10", "weight": 0.45}
+    ],
+    "q_text": "Which built-in function is commonly used for runtime introspection of object attributes?",
+    "correct_option": "A",
+    "options": {
+      "A": {
+        "text": "getattr()",
+        "is_correct": true
+      },
+      "B": {
+        "text": "yield()",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ITER_04", "weight": 0.80},
+          {"node_id": "PY_ADV_09", "weight": 0.60}
+        ]
+      },
+      "C": {
+        "text": "compile()",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_11", "weight": 0.55},
+          {"node_id": "PY_ADV_09", "weight": 0.72}
+        ]
+      },
+      "D": {
+        "text": "await()",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONC_04", "weight": 0.65},
+          {"node_id": "PY_ADV_09", "weight": 0.78}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_038",
+    "difficulty": 0.83,
+    "concept_coverage": [
+      {"node_id": "PY_ADV_08", "weight": 0.60},
+      {"node_id": "PY_MEMORY_01", "weight": 0.40}
+    ],
+    "q_text": "What is a weak reference in Python?",
+    "correct_option": "C",
+    "options": {
+      "A": {
+        "text": "A reference that prevents garbage collection",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_08", "weight": 0.88},
+          {"node_id": "PY_MEMORY_05", "weight": 0.60}
+        ]
+      },
+      "B": {
+        "text": "A reference that has lower memory consumption",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_MEMORY_01", "weight": 0.55},
+          {"node_id": "PY_ADV_08", "weight": 0.82}
+        ]
+      },
+      "C": {
+        "text": "A reference that does not increase an object's reference count for lifetime management",
+        "is_correct": true
+      },
+      "D": {
+        "text": "A reference that only works with immutable objects",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_MEMORY_02", "weight": 0.45},
+          {"node_id": "PY_ADV_08", "weight": 0.85}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_039",
+    "difficulty": 0.84,
+    "concept_coverage": [
+      {"node_id": "PY_ADV_14", "weight": 0.50},
+      {"node_id": "PY_FILE_05", "weight": 0.50}
+    ],
+    "q_text": "Which pair of methods is required for a custom context manager class?",
+    "correct_option": "B",
+    "options": {
+      "A": {
+        "text": "__init__ and __del__",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_05", "weight": 0.60},
+          {"node_id": "PY_ADV_14", "weight": 0.82}
+        ]
+      },
+      "B": {
+        "text": "__enter__ and __exit__",
+        "is_correct": true
+      },
+      "C": {
+        "text": "__iter__ and __next__",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ITER_02", "weight": 0.75},
+          {"node_id": "PY_ADV_14", "weight": 0.78}
+        ]
+      },
+      "D": {
+        "text": "__call__ and __repr__",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_15", "weight": 0.65},
+          {"node_id": "PY_ADV_14", "weight": 0.80}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_040",
+    "difficulty": 0.85,
+    "concept_coverage": [
+      {"node_id": "PY_ADV_17", "weight": 0.65},
+      {"node_id": "PY_CONC_02", "weight": 0.35}
+    ],
+    "q_text": "A race condition occurs when:",
+    "correct_option": "D",
+    "options": {
+      "A": {
+        "text": "Multiple functions have the same name",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_12", "weight": 0.55},
+          {"node_id": "PY_ADV_17", "weight": 0.80}
+        ]
+      },
+      "B": {
+        "text": "A process exceeds CPU limits",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONC_03", "weight": 0.55},
+          {"node_id": "PY_ADV_17", "weight": 0.75}
+        ]
+      },
+      "C": {
+        "text": "Two classes inherit from the same parent",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_09", "weight": 0.65},
+          {"node_id": "PY_ADV_17", "weight": 0.80}
+        ]
+      },
+      "D": {
+        "text": "Program behavior depends on unpredictable timing of concurrent access to shared data",
+        "is_correct": true
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_041",
+    "difficulty": 0.86,
+    "concept_coverage": [
+      {"node_id": "PY_TYPE_03", "weight": 0.60},
+      {"node_id": "PY_TYPE_02", "weight": 0.40}
+    ],
+    "q_text": "What is the primary purpose of a Protocol in Python's typing system?",
+    "correct_option": "A",
+    "options": {
+      "A": {
+        "text": "To enable structural subtyping based on behavior rather than inheritance",
+        "is_correct": true
+      },
+      "B": {
+        "text": "To enforce runtime interface checks automatically",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_TYPE_03", "weight": 0.92},
+          {"node_id": "PY_TYPE_01", "weight": 0.55}
+        ]
+      },
+      "C": {
+        "text": "To replace abstract base classes completely",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_05", "weight": 0.70},
+          {"node_id": "PY_TYPE_03", "weight": 0.80}
+        ]
+      },
+      "D": {
+        "text": "To optimize method dispatch performance",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_19", "weight": 0.55},
+          {"node_id": "PY_TYPE_03", "weight": 0.82}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_042",
+    "difficulty": 0.87,
+    "concept_coverage": [
+      {"node_id": "PY_ADV_02", "weight": 0.65},
+      {"node_id": "PY_OOP_18", "weight": 0.35}
+    ],
+    "q_text": "Which statement best describes a descriptor in Python?",
+    "correct_option": "D",
+    "options": {
+      "A": {
+        "text": "A special form of generator",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ITER_03", "weight": 0.72},
+          {"node_id": "PY_ADV_02", "weight": 0.85}
+        ]
+      },
+      "B": {
+        "text": "A class used only for serialization",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_02", "weight": 0.80}
+        ]
+      },
+      "C": {
+        "text": "A mechanism for managing imports",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_12", "weight": 0.70},
+          {"node_id": "PY_ADV_02", "weight": 0.82}
+        ]
+      },
+      "D": {
+        "text": "An object implementing __get__, __set__, or __delete__ to customize attribute access",
+        "is_correct": true
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_043",
+    "difficulty": 0.88,
+    "concept_coverage": [
+      {"node_id": "PY_ADV_15", "weight": 0.60},
+      {"node_id": "PY_CONC_05", "weight": 0.40}
+    ],
+    "q_text": "What distinguishes an async generator from a regular generator?",
+    "correct_option": "B",
+    "options": {
+      "A": {
+        "text": "It runs in a separate operating system thread",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONC_01", "weight": 0.80},
+          {"node_id": "PY_ADV_15", "weight": 0.75}
+        ]
+      },
+      "B": {
+        "text": "It can yield values within an async context and be consumed using async iteration",
+        "is_correct": true
+      },
+      "C": {
+        "text": "It automatically parallelizes execution",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONC_04", "weight": 0.65},
+          {"node_id": "PY_ADV_15", "weight": 0.85}
+        ]
+      },
+      "D": {
+        "text": "It always executes faster than regular generators",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_19", "weight": 0.55},
+          {"node_id": "PY_ADV_15", "weight": 0.82}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_044",
+    "difficulty": 0.89,
+    "concept_coverage": [
+      {"node_id": "PY_ADV_09", "weight": 0.50},
+      {"node_id": "PY_ADV_11", "weight": 0.50}
+    ],
+    "q_text": "Which module is commonly used to inspect Python bytecode instructions?",
+    "correct_option": "C",
+    "options": {
+      "A": {
+        "text": "inspect",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_09", "weight": 0.72},
+          {"node_id": "PY_ADV_11", "weight": 0.65}
+        ]
+      },
+      "B": {
+        "text": "types",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_11", "weight": 0.78}
+        ]
+      },
+      "C": {
+        "text": "dis",
+        "is_correct": true
+      },
+      "D": {
+        "text": "marshal",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_11", "weight": 0.82},
+          {"node_id": "PY_MODULE_01", "weight": 0.35}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_045",
+    "difficulty": 0.90,
+    "concept_coverage": [
+      {"node_id": "PY_ADV_10", "weight": 0.60},
+      {"node_id": "PY_ADV_09", "weight": 0.40}
+    ],
+    "q_text": "What is the effect of overriding __getattr__ in a class?",
+    "correct_option": "A",
+    "options": {
+      "A": {
+        "text": "It allows handling attribute lookups that would otherwise raise AttributeError",
+        "is_correct": true
+      },
+      "B": {
+        "text": "It intercepts every attribute access including existing ones",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_10", "weight": 0.90},
+          {"node_id": "PY_ADV_09", "weight": 0.45}
+        ]
+      },
+      "C": {
+        "text": "It disables inheritance for attributes",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_09", "weight": 0.55},
+          {"node_id": "PY_ADV_10", "weight": 0.82}
+        ]
+      },
+      "D": {
+        "text": "It automatically creates missing attributes in memory",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_MEMORY_01", "weight": 0.40},
+          {"node_id": "PY_ADV_10", "weight": 0.85}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_046",
+    "difficulty": 0.91,
+    "concept_coverage": [
+      {"node_id": "PY_ADV_01", "weight": 0.70},
+      {"node_id": "PY_OOP_01", "weight": 0.30}
+    ],
+    "q_text": "A metaclass is best described as:",
+    "correct_option": "D",
+    "options": {
+      "A": {
+        "text": "A class that can only be inherited once",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_OOP_09", "weight": 0.60},
+          {"node_id": "PY_ADV_01", "weight": 0.82}
+        ]
+      },
+      "B": {
+        "text": "A special decorator for abstract classes",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_FUNC_11", "weight": 0.50},
+          {"node_id": "PY_ADV_01", "weight": 0.85}
+        ]
+      },
+      "C": {
+        "text": "A runtime optimization mechanism",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_19", "weight": 0.60},
+          {"node_id": "PY_ADV_01", "weight": 0.80}
+        ]
+      },
+      "D": {
+        "text": "A class whose instances are themselves classes",
+        "is_correct": true
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_047",
+    "difficulty": 0.92,
+    "concept_coverage": [
+      {"node_id": "PY_ADV_12", "weight": 0.60},
+      {"node_id": "PY_MODULE_05", "weight": 0.40}
+    ],
+    "q_text": "What is the primary purpose of an import hook?",
+    "correct_option": "B",
+    "options": {
+      "A": {
+        "text": "To automatically install missing packages",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_MODULE_07", "weight": 0.65},
+          {"node_id": "PY_ADV_12", "weight": 0.85}
+        ]
+      },
+      "B": {
+        "text": "To customize how modules are located, loaded, or executed during import",
+        "is_correct": true
+      },
+      "C": {
+        "text": "To improve garbage collection of imported modules",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_MEMORY_05", "weight": 0.55},
+          {"node_id": "PY_ADV_12", "weight": 0.82}
+        ]
+      },
+      "D": {
+        "text": "To enforce type checking across packages",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_TYPE_01", "weight": 0.50},
+          {"node_id": "PY_ADV_12", "weight": 0.80}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_048",
+    "difficulty": 0.93,
+    "concept_coverage": [
+      {"node_id": "PY_ADV_06", "weight": 0.40},
+      {"node_id": "PY_ADV_01", "weight": 0.60}
+    ],
+    "q_text": "Why is understanding MRO important when designing metaclass-heavy frameworks?",
+    "correct_option": "C",
+    "options": {
+      "A": {
+        "text": "Because MRO controls thread scheduling order",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONC_01", "weight": 0.65},
+          {"node_id": "PY_ADV_06", "weight": 0.85}
+        ]
+      },
+      "B": {
+        "text": "Because MRO determines garbage collection priorities",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_MEMORY_05", "weight": 0.55},
+          {"node_id": "PY_ADV_06", "weight": 0.80}
+        ]
+      },
+      "C": {
+        "text": "Because attribute and method lookup order affects metaclass and inheritance behavior",
+        "is_correct": true
+      },
+      "D": {
+        "text": "Because MRO decides package installation precedence",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_MODULE_07", "weight": 0.60},
+          {"node_id": "PY_ADV_06", "weight": 0.82}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_049",
+    "difficulty": 0.94,
+    "concept_coverage": [
+      {"node_id": "PY_ADV_16", "weight": 0.65},
+      {"node_id": "PY_CONC_04", "weight": 0.35}
+    ],
+    "q_text": "What is the role of the asyncio event loop?",
+    "correct_option": "A",
+    "options": {
+      "A": {
+        "text": "To schedule and coordinate execution of asynchronous tasks and callbacks",
+        "is_correct": true
+      },
+      "B": {
+        "text": "To create one operating system process per coroutine",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONC_03", "weight": 0.75},
+          {"node_id": "PY_ADV_16", "weight": 0.82}
+        ]
+      },
+      "C": {
+        "text": "To automatically parallelize all CPU-bound operations",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_CONC_04", "weight": 0.70},
+          {"node_id": "PY_ADV_16", "weight": 0.85}
+        ]
+      },
+      "D": {
+        "text": "To replace Python's garbage collector during async execution",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_MEMORY_05", "weight": 0.60},
+          {"node_id": "PY_ADV_16", "weight": 0.88}
+        ]
+      }
+    }
+  },
+  {
+    "question_id": "PY_Q_050",
+    "difficulty": 0.95,
+    "concept_coverage": [
+      {"node_id": "PY_ADV_01", "weight": 0.30},
+      {"node_id": "PY_ADV_02", "weight": 0.25},
+      {"node_id": "PY_ADV_06", "weight": 0.20},
+      {"node_id": "PY_ADV_12", "weight": 0.25}
+    ],
+    "q_text": "In a highly dynamic framework that uses metaclasses, descriptors, custom import hooks, and multiple inheritance simultaneously, which component is MOST responsible for determining how an attribute reference ultimately resolves at runtime?",
+    "correct_option": "D",
+    "options": {
+      "A": {
+        "text": "The import hook alone",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_12", "weight": 0.90},
+          {"node_id": "PY_ADV_09", "weight": 0.40}
+        ]
+      },
+      "B": {
+        "text": "The descriptor protocol alone",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_02", "weight": 0.88},
+          {"node_id": "PY_ADV_06", "weight": 0.55}
+        ]
+      },
+      "C": {
+        "text": "The metaclass alone",
+        "is_correct": false,
+        "misconception_concepts": [
+          {"node_id": "PY_ADV_01", "weight": 0.90},
+          {"node_id": "PY_ADV_06", "weight": 0.65}
+        ]
+      },
+      "D": {
+        "text": "The interaction of MRO, descriptor precedence, metaclass behavior, and runtime attribute lookup rules",
+        "is_correct": true
+      }
+    }
+  }
+]

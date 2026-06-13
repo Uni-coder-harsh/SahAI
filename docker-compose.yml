@@ -1,31 +1,29 @@
 version: '3.8'
 
 services:
+  # 1. PostgreSQL (pgvector enabled)
   postgres:
     image: pgvector/pgvector:pg16
     container_name: sahai-postgres
     environment:
-      POSTGRES_USER: sahai_user
-      POSTGRES_PASSWORD: sahai_password
-      POSTGRES_DB: sahai_db
+      POSTGRES_USER: ${PG_USER:-postgres}
+      POSTGRES_PASSWORD: ${PG_PASSWORD:-Bayes@piech_45Ro_G}
+      POSTGRES_DB: ${PG_DATABASE:-postgres}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sahai_user -d sahai_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USER:-postgres} -d ${PG_DATABASE:-postgres}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
+  # 2. MongoDB Document Store
   mongodb:
     image: mongo:7.0
     container_name: sahai-mongodb
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: sahai_admin
-      MONGO_INITDB_ROOT_PASSWORD: sahai_admin_password
-      MONGO_INITDB_DATABASE: sahai_mongo_db
     ports:
       - "27017:27017"
     volumes:
@@ -36,6 +34,7 @@ services:
       timeout: 5s
       retries: 5
 
+  # 3. Redis Telemetry Event Queue
   redis:
     image: redis:7-alpine
     container_name: sahai-redis
@@ -48,6 +47,44 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  # 4. Node.js API Gateway & Static Frontend Web Server
+  api-node:
+    build:
+      context: ./services/api-node
+      dockerfile: Dockerfile
+    container_name: sahai-api-node
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    env_file:
+      - ./ENV/.env
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+
+  # 5. Python Bayesian Mathematical Inference Worker
+  engine-python:
+    build:
+      context: ./services/engine-python
+      dockerfile: Dockerfile
+    container_name: sahai-engine-python
+    env_file:
+      - ./ENV/.env
+    environment:
+      - ENV_MODE=development
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
 
 volumes:
   postgres_data:

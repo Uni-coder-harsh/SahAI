@@ -1,105 +1,168 @@
-# SahAI: Event-Driven, Multi-Tenant Cognitive Architecture
+# SahAI: Distributed State Engine & Event-Driven Cognitive Architecture
 
-This repository is the central hub ("SahAI-Master") for the B2B2C educational cognitive profiling system. It features sub-millisecond telemetry ingestion, asynchronous Bayesian probability inference, institutional multi-tenancy whitelisting, and curriculum DAG propagation.
+This repository is the master orchestration repository (`SahAI`) for the B2B2C educational cognitive profiling and adaptive testing platform. It implements a sub-millisecond event ingestion gateway, a distributed Bayesian probability inference engine, institutional multi-tenancy, and high-performance curriculum Directed Acyclic Graph (DAG) state propagation.
 
 ---
 
 ## 🏗️ System Topology & Data Flow
 
 ```text
-[ Flutter Mobile/Desktop Clients ]
-               │
-      (HTTP / WebSockets)
-               ▼
-   [ Node.js API Gateway ]
-               │
-    ┌──────────┴──────────┐
-    ▼                     ▼
-[ MongoDB Log ]     [ Redis Queue ]
-(Event Sourcing)    (telemetry_queue)
-                          │
-                          ▼
-              [ Python Math Workers ]
-              (Calculates Beta updates & decay)
-                          │
-              ┌───────────┴───────────┐
-              ▼                       ▼
-      [ PostgreSQL DB ]        [ MongoDB Cache ]
-   (Relational tenant data    (Full distribution
-    & cached masteries)        history and flags)
+[ Flutter Mobile/Web/Desktop Client ]
+                 │
+       (HTTP REST / WebSockets)
+                 │  (Edge-Compute Sync Payload)
+                 ▼
+      [ Node.js API Gateway ]
+                 │
+      ┌──────────┴──────────┐
+      ▼                     ▼
+  [ MongoDB ]         [ Upstash Redis ]
+(Raw Log Audit)      (telemetry_queue)
+                            │
+                            ▼
+               [ Python Inference Worker ]
+            (Loads Global DAG into Redis RAM;
+             Computes Beta updates & temporal decay)
+                            │
+               ┌────────────┴────────────┐
+               ▼                         ▼
+        [ Supabase Postgres ]      [ MongoDB Cache ]
+      (User cognitive states:   (Full distribution state)
+         alpha, beta, mastery)
 ```
 
-1. **Cold Start (Onboarding):** A student registers. The Node.js API creates the user record in PostgreSQL and initializes their belief states in the `user_cognitive_states` table with prior Beta distributions ($\alpha = 1.0, \beta = 1.0$, Expected Mastery = $0.50$).
-2. **Telemetry Ingestion:** When the client performs actions, telemetry is sent to Node.js. Node.js writes it to MongoDB as a raw event stream (Event Sourcing) and pushes it to Redis queue, returning a fast HTTP `202 Accepted`.
-3. **Cognitive Computation:** The Python worker pops the event, decays the user's prior parameters based on time elapsed (Ebbinghaus forgetting curve), computes the updated Beta distribution, and writes it back to Mongo and Postgres.
-4. **DAG Propagation:** The Python worker queries the PG curriculum schema for prerequisite nodes (parents) and propagates discounted rewards or penalties to parent nodes based on edge correlation weights.
+### The "Global DAG + Localized Delta" Pattern (MNC-Grade Scaling)
+To support millions of students with sub-millisecond latency, SahAI avoids duplicating the curriculum's correlation matrix per user. 
+* **Global Graph (Immutable)**: The correlation weights ($W_{pre}$, $W_{diag}$) are stored once in the global `advanced_dag_edges` PostgreSQL table. At application startup, the Python worker caches this entire DAG structure into a **Redis Hash** (`global_dag`), reducing database lookup time to **<0.1ms** during telemetry processing.
+* **Localized Belief (Dynamic)**: Student mastery is tracked as probability density functions ($\alpha, \beta$ parameters) inside `user_cognitive_states`. Updates are processed in-memory and committed asynchronously back to PostgreSQL and MongoDB.
 
 ---
 
 ## 📂 Codebase Structure
 
-* `/docker-compose.yml` - Starts PostgreSQL (pgvector), MongoDB, and Redis.
-* `/init-db/init.sql` - Bootstraps Postgres tables, indexes, and a 15-node Computer Science core syllabus.
-* `/services/api-node/` - Node.js Express server handling client requests and queueing telemetry.
-* `/services/engine-python/` - Python worker implementing Bayesian logic and DAG propagation.
-* `/tests/integration_test.js` - Self-contained integration test script verifying the complete loop.
+* `/.github/workflows/ci-cd.yml` - GitHub Actions pipeline featuring automated testing and TruffleHog security scans.
+* `/init-db/init.sql` - Bootstraps Postgres tables, whitelists, indices, and performance log schemas.
+* `/init-db/seed_json.py` - Dynamically seeds concept lists, correlations, and question banks from models.
+* `/services/api-node/` - Express.js REST API gateway managing authentication, user onboarding, and telemetry queuing.
+* `/services/engine-python/` - Python queue listener implementing Bayesian updates, temporal Ebbinghaus decay, and Redis DAG cache traversal.
+* `/services/ml-training/` - Offline training pipeline computing correlation coefficients.
+* `/clients/flutter/` - Frontend codebase compiling to iOS, Android, Desktop, and Flutter Web.
 
 ---
 
 ## 🚀 Local Deployment & Verification
 
-### 1. Boot up database containers
-Ensure Docker is running, then start the containers:
+### 1. Configure the Environment
+Ensure your configurations are set in `ENV/.env` (cloned from the secure master template):
 ```bash
-docker compose up -d
-```
-This loads PostgreSQL on port `5432` (seeded with the CS curriculum graph), MongoDB on port `27017`, and Redis on port `6379`.
+# Relational DB
+PG_HOST=your-supabase-host
+PG_PORT=5432
+PG_USER=postgres
+PG_PASSWORD=your-password
+PG_DATABASE=postgres
+PG_SSL=true
 
-### 2. Run Python Math Unit Tests
-Ensure you have Python 3.12+ installed:
+# Cache & In-Memory Queue
+REDIS_URL=rediss://default:your-token@your-upstash-endpoint.upstash.io:6379
+
+# Audit Store
+MONGO_URI=mongodb+srv://your-user:your-pass@cluster.mongodb.net/sahai?retryWrites=true&w=majority
+```
+
+### 2. Seeding the Database
+To populate the database tables with default concepts, correlations, and the question bank:
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 pip install -r services/engine-python/requirements.txt
-PYTHONPATH=services/engine-python pytest services/engine-python/tests/test_math.py
+python init-db/seed_json.py
 ```
 
-### 3. Start the API Gateway
-In a terminal, run:
+### 3. Running the Python Inference Worker
+Start the background worker queue listener:
+```bash
+PYTHONPATH=services/engine-python/src python services/engine-python/src/main.py
+```
+Upon startup, the worker will connect to all datastores, fetch the global DAG edges from PostgreSQL, cache them in Upstash Redis RAM, and start polling the `telemetry_queue`.
+
+### 4. Running the API Gateway
 ```bash
 cd services/api-node
 npm install
 npm start
 ```
-The server will bind to port `3000`.
+The gateway will start on `http://localhost:3000`.
 
-### 4. Start the Inference Worker
-In another terminal, run:
+### 5. Running the Flutter Webapp Locally
+To run the client application in development mode:
 ```bash
-source venv/bin/activate
-python services/engine-python/src/worker.py
-```
-The worker will begin polling messages from Redis.
-
-### 5. Run the End-to-End Integration Test
-Verify telemetry logging, queue processing, math updates, and DAG propagation:
-```bash
-node tests/integration_test.js
+cd clients/flutter
+flutter pub get
+flutter run -d chrome
 ```
 
 ---
 
-## 📂 Git Submodule Strategy
+## ☁️ Enterprise Cloud Deployment Strategy
 
-To isolate developer actions across teams (Flutter, Node, Python) while locking in stable releases:
-1. Create independent GitHub repositories for `sahai-client-flutter`, `sahai-api-node`, and `sahai-engine-python`.
-2. Delete the local folders if you want to pull clean submodules:
-```bash
-git submodule add https://github.com/your-org/sahai-client-flutter.git clients/flutter
-git submodule add https://github.com/your-org/sahai-api-node.git services/api-node
-git submodule add https://github.com/your-org/sahai-engine-python.git services/engine-python
+### 1. Flutter Web Client on Vercel
+Flutter Web compiles to a single-page application (SPA). Since the `build/` folder is gitignored, you cannot push pre-compiled static files. Vercel's standard runner lacks the Flutter SDK to build it on the fly. 
+
+To deploy to Vercel, use a **GitHub Actions CI/CD pipeline**:
+1. **Build Step**: Compile the app using the Flutter Action in your GitHub workflow:
+   ```yaml
+   - name: Setup Flutter
+     uses: subosito/flutter-action@v2
+     with:
+       channel: 'stable'
+   - name: Build Web
+     run: |
+       cd clients/flutter
+       flutter build web --release
+   ```
+2. **Deploy Step**: Upload the generated `clients/flutter/build/web` static folder directly to Vercel using the Vercel GitHub Action (e.g. `amondnet/vercel-action` or `vercel/actions`):
+   ```yaml
+   - name: Deploy to Vercel
+     uses: amondnet/vercel-action@v20
+     with:
+       vercel-token: ${{ secrets.VERCEL_TOKEN }}
+       vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+       vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+       working-directory: clients/flutter/build/web
+       vercel-args: '--prod'
+   ```
+3. **SPAs Routing Rule**: Inside `clients/flutter/vercel.json`, we have configured a rewrite rule mapping all sub-routes back to `index.html` to avoid `404 Not Found` errors on page reloads.
+
+### 2. Node.js Gateway & Python Workers on Railway
+Railway natively supports multi-service deployments from a single monorepo.
+* **Service A: API Gateway**
+  * Root Directory: `services/api-node`
+  * Start Command: `npm start`
+* **Service B: Inference worker**
+  * Root Directory: `services/engine-python`
+  * Build Type: Docker (Railway automatically picks up the `Dockerfile` in the subfolder) or Nixpacks.
+  * Start Command: `python src/main.py`
+  * Add the shared `ENV/.env` variables inside Railway's shared environment interface.
+
+---
+
+## 📶 Low-Internet "Offline-Sync" Engine Design
+To support students in rural regions with low-bandwidth (2G/3G) internet connections, SahAI implements the **Edge-Computation & Batch Sync** protocol:
+
+```text
+[ Flutter SQLite (Offline) ]  ──(Saves updates locally)──> [ Queue Sync Batches ]
+                                                                  │
+                                                        (When online, push batch)
+                                                                  ▼
+                                                      [ Node.js Sync Endpoint ]
+                                                                  │
+                                                        (Pushed to Redis Queue)
+                                                                  ▼
+                                                       [ Python Batch Worker ]
 ```
-3. To pull down all repositories on a fresh clone:
-```bash
-git clone --recurse-submodules https://github.com/your-org/SahAI-Master.git
-```
+
+1. **Client-Side Cache**: During the initial login, the Flutter app downloads the relevant chunk of the concept DAG (e.g., Python Basics nodes) and caches it in the client device using a local `SQLite` database.
+2. **Local Inference**: As the student answers questions offline, the Flutter client updates their Beta distributions ($\alpha, \beta$ parameters) **locally on the device** in real-time.
+3. **Batch Sync**: The client logs each response metrics without pinging the cloud. When a stable connection is detected, the logged payloads are compiled into a single `BatchUpdate` payload and sent to `/api/user/sync-cognitive-state`.
+4. **Conflict Resolution**: The backend processes the batch sequentially based on client timestamps. If the server state has updated in the interim (e.g. the student practiced on another device), the server applies the delta updates ($\Delta\alpha, \Delta\beta$) to the server's master state.
