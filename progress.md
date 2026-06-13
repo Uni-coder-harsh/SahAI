@@ -278,6 +278,7 @@ This section documents the configuration and execution of local and remote Docke
 | **Local Docker Hub Pushes** | Completed | Successfully compiled and pushed local containers `sahai-api-node`, `sahai-engine-python`, and `sahai-ml-training` to Docker Hub repository under user namespace `harsh45ro`. |
 | **TruffleHog False Positive Bypass** | Completed | Cleaned up dummy credentials placeholder in `README.md` to prevent TruffleHog secrets scanner pipeline validation failures. |
 | **Hosting Stack Clarification** | Completed | Provided detailed architectural maps distinguishing between Docker containerization, Vercel frontend SPA hosting, and Railway backend container provisioning. |
+| **Flutter Web Vercel Pipeline** | Completed | Configured a new `deploy-frontend` job inside `.github/workflows/ci-cd.yml` to compile Flutter Web with `subosito/flutter-action` and deploy directly to Vercel via CLI Action, bypassing Vercel's lacking build environment. |
 
 ---
 
@@ -287,6 +288,7 @@ This section documents the configuration and execution of local and remote Docke
 * **[.github/workflows/ci-cd.yml](file:///home/harsh/Desktop/SahAI/SahAI/.github/workflows/ci-cd.yml)**: 
   * Added `environment: SahAI` to ensure environment variables are exposed to jobs.
   * Mapped username authentication specifically to `${{ vars.DOCKER_USERNAME }}` rather than secrets.
+  * Added the `deploy-frontend` workflow job to compile Flutter web and upload static outputs directly to Vercel.
 * **[README.md](file:///home/harsh/Desktop/SahAI/SahAI/README.md)**: Updated mock DB connections placeholder to prevent false positive security scans.
 * **[progress.md](file:///home/harsh/Desktop/SahAI/SahAI/progress.md)**: Appended current progress and deployment clarifications.
 
@@ -294,4 +296,4 @@ This section documents the configuration and execution of local and remote Docke
 * **`harsh45ro/sahai-api-node:latest`**: Local image compiled and pushed to registry.
 * **`harsh45ro/sahai-engine-python:latest`**: Local image compiled and pushed to registry.
 * **`harsh45ro/sahai-ml-training:latest`**: Local image compiled and pushed to registry.
-264: 
+
