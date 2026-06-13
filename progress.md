@@ -280,6 +280,7 @@ This section documents the configuration and execution of local and remote Docke
 | **Hosting Stack Clarification** | Completed | Provided detailed architectural maps distinguishing between Docker containerization, Vercel frontend SPA hosting, and Railway backend container provisioning. |
 | **Flutter Web Vercel Pipeline** | Completed | Configured a new `deploy-frontend` job inside `.github/workflows/ci-cd.yml` to compile Flutter Web with `subosito/flutter-action` and deploy directly to Vercel via CLI Action, bypassing Vercel's lacking build environment. |
 | **Vercel Output Directory Fix** | Completed | Added `"outputDirectory": "."` to `vercel.json` and added a `cp vercel.json build/web/` command in the CI/CD build script so Vercel uses the correct root folder and avoids the missing `public` folder error. |
+| **Docker Path Traversal Fix** | Completed | Replaced static `.parents[3]` lookups in Python backend configs (`train.py` and `config.py`) with robust parent-traversing searches to prevent Docker container crashes. |
 
 ---
 
@@ -295,7 +296,11 @@ This section documents the configuration and execution of local and remote Docke
 * **[progress.md](file:///home/harsh/Desktop/SahAI/SahAI/progress.md)**: Appended current progress and deployment clarifications.
 * **[clients/flutter/vercel.json](file:///home/harsh/Desktop/SahAI/SahAI/clients/flutter/vercel.json)**: Added `"outputDirectory": "."` to route Vercel CLI deployments directly from the build outputs.
 
-#### 2. Local Container Registries (Docker Hub)
+#### 2. Python Inference & Training Submodules
+* **[services/engine-python/src/config.py](file:///home/harsh/Desktop/SahAI/SahAI/services/engine-python/src/config.py)**: Refactored dotenv configuration to search dynamically for the unified `ENV` directory, falling back to system environment variables inside Docker.
+* **[services/ml-training/src/train.py](file:///home/harsh/Desktop/SahAI/SahAI/services/ml-training/src/train.py)**: Applied identical dynamic environment path-lookup logic.
+
+#### 3. Local Container Registries (Docker Hub)
 * **`harsh45ro/sahai-api-node:latest`**: Local image compiled and pushed to registry.
 * **`harsh45ro/sahai-engine-python:latest`**: Local image compiled and pushed to registry.
 * **`harsh45ro/sahai-ml-training:latest`**: Local image compiled and pushed to registry.
