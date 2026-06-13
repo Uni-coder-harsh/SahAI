@@ -317,3 +317,52 @@ This section documents the configuration and execution of local and remote Docke
 * **`harsh45ro/sahai-engine-python:latest`**: Local image compiled and pushed to registry.
 * **`harsh45ro/sahai-ml-training:latest`**: Local image compiled and pushed to registry.
 
+---
+
+## 🛑 BREAKPOINT: 2026-06-13T23:15:00Z | ID: CLIENT_CORS_DEBUG_9A4D
+
+## 📦 Client Debug Logging, API URL Auto-Correction & Railway/Vercel Stack Fixes
+
+This section documents the debugging and resolution of runtime errors during client signup/login actions, the integration of verbose browser console logs, and the details of the latest GitHub Actions pipeline executions.
+
+### 📋 Task List & Status
+
+| Task / Feature | Status | Implementation Details |
+| :--- | :--- | :--- |
+| **Vercel Output Path Config** | Completed | Fixed output directory configuration in `vercel.json` and added a build-step copying command to prevent missing `public` folder deployment crashes. |
+| **Railway Container Path Fixes** | Completed | Replaced static `.parents[3]` path lookups in Python (`train.py` and `config.py`) with dynamic lookup traversals to prevent Docker container crashes. |
+| **Secure API URL Injection** | Completed | Added compile-time environment variable injection (`API_URL`) using `--dart-define` inside the GitHub Actions pipeline. |
+| **API URL Suffix Auto-Resolver** | Completed | Patched `api_service.dart` to automatically detect and append `/api` to the frontend base URL if omitted by the user, preventing static server fallback `405 Method Not Allowed` errors. |
+| **Client Safe JSON Decoder** | Completed | Replaced raw `jsonDecode` calls with a `_safeJsonDecode` try-catch utility, preventing `FormatSyntaxError: unexpected end of json` client crashes on non-JSON response streams. |
+| **Client Console Debug Prints** | Completed | Added verbose `print('[API_SERVICE] ...')` statements inside Flutter's `api_service.dart` to log resolved API endpoints, outgoing requests, response statuses, and payloads. |
+
+---
+
+### 📂 Summary of New Changes
+
+#### 1. CI/CD Pipeline & Configuration (`/` root)
+* **[.github/workflows/ci-cd.yml](file:///home/harsh/Desktop/SahAI/SahAI/.github/workflows/ci-cd.yml)**: 
+  * Copied `vercel.json` to the build directory prior to deployment.
+  * Injected `--dart-define=API_URL` during Flutter Web release builds.
+* **[progress.md](file:///home/harsh/Desktop/SahAI/SahAI/progress.md)**: Documented current run fixes and debug additions.
+
+#### 2. Flutter Client Submodule (`/clients/flutter/`)
+* **[clients/flutter/vercel.json](file:///home/harsh/Desktop/SahAI/SahAI/clients/flutter/vercel.json)**: Configured `"outputDirectory": "."` for direct asset serving.
+* **[lib/services/api_service.dart](file:///home/harsh/Desktop/SahAI/SahAI/clients/flutter/lib/services/api_service.dart)**: 
+  * Implemented compile-time API URL resolving and auto-correction checks.
+  * Added `_safeJsonDecode` utility and verbose browser logging print statements.
+
+#### 3. Python Submodules (`/services/`)
+* **[services/engine-python/src/config.py](file:///home/harsh/Desktop/SahAI/SahAI/services/engine-python/src/config.py)**: Patched dotenv loading to handle flat Docker paths gracefully.
+* **[services/ml-training/src/train.py](file:///home/harsh/Desktop/SahAI/SahAI/services/ml-training/src/train.py)**: Applied dynamic path traversal for env configurations.
+
+---
+
+### 🚀 Last GitHub Actions Pipeline Executions
+* **Submodule Commit (Clients)**: [52535f4](https://github.com/Uni-coder-harsh/sahai-client-flutter/commit/52535f4a4bfcb6630f9a2e3a8efc91c322d8615a) (*"feat(api): add debug logging for API requests and responses in web console"*)
+* **Submodule Commit (Engine)**: [6fc686c](https://github.com/Uni-coder-harsh/sahai-engine-python/commit/6fc686c121e7d23d9b4b0451cfdb8d0ea6df201a) (*"fix(config): resolve dynamic path traversal for ENV/.env in Docker"*)
+* **Submodule Commit (ML)**: [f4acf05](https://github.com/Uni-coder-harsh/sahai-ml-training/commit/f4acf05f96898d9e6eb7b4b3b8901c23315a6b01) (*"fix(ml): resolve dynamic path traversal for ENV/.env in Docker"*)
+* **Submodule Commit (API Gateway)**: [87b9a22](https://github.com/Uni-coder-harsh/sahai-api-node/commit/87b9a22e8db925bdf93982c4396d31efa0443aca) (*"fix(redis): enforce rediss secure protocol and tls options for remote queues"*)
+* **Parent Monorepo Commit (Master Sync)**: [f132499](https://github.com/Uni-coder-harsh/SahAI/commit/f132499ad88d925bdf93982c4396d31efa0443aca) (*"fix(ci): update clients/flutter submodule pointer and progress for debug logging"*)
+
+
