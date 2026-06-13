@@ -282,6 +282,7 @@ This section documents the configuration and execution of local and remote Docke
 | **Vercel Output Directory Fix** | Completed | Added `"outputDirectory": "."` to `vercel.json` and added a `cp vercel.json build/web/` command in the CI/CD build script so Vercel uses the correct root folder and avoids the missing `public` folder error. |
 | **Docker Path Traversal Fix** | Completed | Replaced static `.parents[3]` lookups in Python backend configs (`train.py` and `config.py`) with robust parent-traversing searches to prevent Docker container crashes. |
 | **Secure API URL Injection** | Completed | Mapped Flutter API endpoints to utilize `String.fromEnvironment('API_URL')` for compile-time base URL injection. Configured `.github/workflows/ci-cd.yml` to inject the Railway API endpoint via `--dart-define=API_URL`. |
+| **Node API Redis TLS Bypass** | Completed | Updated `services/api-node/src/queue/producer.js` to automatically convert remote connections to `rediss://` and configure TLS client options (`rejectUnauthorized: false`) preventing socket teardowns. |
 
 ---
 
@@ -302,10 +303,13 @@ This section documents the configuration and execution of local and remote Docke
 * **[services/engine-python/src/config.py](file:///home/harsh/Desktop/SahAI/SahAI/services/engine-python/src/config.py)**: Refactored dotenv configuration to search dynamically for the unified `ENV` directory, falling back to system environment variables inside Docker.
 * **[services/ml-training/src/train.py](file:///home/harsh/Desktop/SahAI/SahAI/services/ml-training/src/train.py)**: Applied identical dynamic environment path-lookup logic.
 
-#### 3. Flutter Client Submodule
+#### 3. Node.js API Gateway Submodule
+* **[services/api-node/src/queue/producer.js](file:///home/harsh/Desktop/SahAI/SahAI/services/api-node/src/queue/producer.js)**: Configured client connection options to automatically parse/upgrade remote strings and enforce TLS settings.
+
+#### 4. Flutter Client Submodule
 * **[clients/flutter/lib/services/api_service.dart](file:///home/harsh/Desktop/SahAI/SahAI/clients/flutter/lib/services/api_service.dart)**: Mapped static `baseUrl` to load from compile-time environment variables (`API_URL`) with fallback defaults for local execution.
 
-#### 4. Local Container Registries (Docker Hub)
+#### 5. Local Container Registries (Docker Hub)
 * **`harsh45ro/sahai-api-node:latest`**: Local image compiled and pushed to registry.
 * **`harsh45ro/sahai-engine-python:latest`**: Local image compiled and pushed to registry.
 * **`harsh45ro/sahai-ml-training:latest`**: Local image compiled and pushed to registry.
