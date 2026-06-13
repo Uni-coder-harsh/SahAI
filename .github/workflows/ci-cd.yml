@@ -129,6 +129,7 @@ jobs:
       run: |
         cd clients/flutter
         flutter build web --release
+        cp vercel.json build/web/
 
     - name: Deploy to Vercel
       uses: amondnet/vercel-action@v20
