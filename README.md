@@ -67,7 +67,7 @@ PG_SSL=true
 REDIS_URL=rediss://default:your-token@your-upstash-endpoint.upstash.io:6379
 
 # Audit Store
-MONGO_URI=mongodb+srv://your-user:your-pass@cluster.mongodb.net/sahai?retryWrites=true&w=majority
+MONGO_URI=mongodb_url_to_be_places_here
 ```
 
 ### 2. Seeding the Database

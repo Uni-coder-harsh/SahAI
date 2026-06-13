@@ -57,6 +57,7 @@ jobs:
     name: Build & Push Microservices
     needs: test-and-lint
     runs-on: ubuntu-latest
+    environment: SahAI
     if: github.ref == 'refs/heads/main'
 
     steps:
@@ -72,7 +73,7 @@ jobs:
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
+        username: ${{ vars.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     # Build and push Node.js API Gateway image
@@ -82,8 +83,8 @@ jobs:
         context: ./services/api-node
         push: true
         tags: |
-          ${{ secrets.DOCKER_USERNAME }}/sahai-api-node:latest
-          ${{ secrets.DOCKER_USERNAME }}/sahai-api-node:${{ github.sha }}
+          ${{ vars.DOCKER_USERNAME }}/sahai-api-node:latest
+          ${{ vars.DOCKER_USERNAME }}/sahai-api-node:${{ github.sha }}
 
     # Build and push Python Inference Engine image
     - name: Build and Push Engine Python Image
@@ -92,8 +93,8 @@ jobs:
         context: ./services/engine-python
         push: true
         tags: |
-          ${{ secrets.DOCKER_USERNAME }}/sahai-engine-python:latest
-          ${{ secrets.DOCKER_USERNAME }}/sahai-engine-python:${{ github.sha }}
+          ${{ vars.DOCKER_USERNAME }}/sahai-engine-python:latest
+          ${{ vars.DOCKER_USERNAME }}/sahai-engine-python:${{ github.sha }}
 
     # Build and push ML Training image
     - name: Build and Push ML Training Image
@@ -102,5 +103,5 @@ jobs:
         context: ./services/ml-training
         push: true
         tags: |
-          ${{ secrets.DOCKER_USERNAME }}/sahai-ml-training:latest
-          ${{ secrets.DOCKER_USERNAME }}/sahai-ml-training:${{ github.sha }}
+          ${{ vars.DOCKER_USERNAME }}/sahai-ml-training:latest
+          ${{ vars.DOCKER_USERNAME }}/sahai-ml-training:${{ github.sha }}
