@@ -128,7 +128,7 @@ jobs:
     - name: Build Flutter Web
       run: |
         cd clients/flutter
-        flutter build web --release
+        flutter build web --release --dart-define=API_URL=${{ vars.API_URL }}
         cp vercel.json build/web/
 
     - name: Deploy to Vercel

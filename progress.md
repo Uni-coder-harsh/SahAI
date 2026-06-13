@@ -281,6 +281,7 @@ This section documents the configuration and execution of local and remote Docke
 | **Flutter Web Vercel Pipeline** | Completed | Configured a new `deploy-frontend` job inside `.github/workflows/ci-cd.yml` to compile Flutter Web with `subosito/flutter-action` and deploy directly to Vercel via CLI Action, bypassing Vercel's lacking build environment. |
 | **Vercel Output Directory Fix** | Completed | Added `"outputDirectory": "."` to `vercel.json` and added a `cp vercel.json build/web/` command in the CI/CD build script so Vercel uses the correct root folder and avoids the missing `public` folder error. |
 | **Docker Path Traversal Fix** | Completed | Replaced static `.parents[3]` lookups in Python backend configs (`train.py` and `config.py`) with robust parent-traversing searches to prevent Docker container crashes. |
+| **Secure API URL Injection** | Completed | Mapped Flutter API endpoints to utilize `String.fromEnvironment('API_URL')` for compile-time base URL injection. Configured `.github/workflows/ci-cd.yml` to inject the Railway API endpoint via `--dart-define=API_URL`. |
 
 ---
 
@@ -292,6 +293,7 @@ This section documents the configuration and execution of local and remote Docke
   * Mapped username authentication specifically to `${{ vars.DOCKER_USERNAME }}` rather than secrets.
   * Added the `deploy-frontend` workflow job to compile Flutter web and upload static outputs directly to Vercel.
   * Added a copying command to copy `vercel.json` to `build/web/` prior to the deployment execution.
+  * Configured Flutter Web compile step to inject `--dart-define=API_URL=${{ vars.API_URL }}`.
 * **[README.md](file:///home/harsh/Desktop/SahAI/SahAI/README.md)**: Updated mock DB connections placeholder to prevent false positive security scans.
 * **[progress.md](file:///home/harsh/Desktop/SahAI/SahAI/progress.md)**: Appended current progress and deployment clarifications.
 * **[clients/flutter/vercel.json](file:///home/harsh/Desktop/SahAI/SahAI/clients/flutter/vercel.json)**: Added `"outputDirectory": "."` to route Vercel CLI deployments directly from the build outputs.
@@ -300,7 +302,10 @@ This section documents the configuration and execution of local and remote Docke
 * **[services/engine-python/src/config.py](file:///home/harsh/Desktop/SahAI/SahAI/services/engine-python/src/config.py)**: Refactored dotenv configuration to search dynamically for the unified `ENV` directory, falling back to system environment variables inside Docker.
 * **[services/ml-training/src/train.py](file:///home/harsh/Desktop/SahAI/SahAI/services/ml-training/src/train.py)**: Applied identical dynamic environment path-lookup logic.
 
-#### 3. Local Container Registries (Docker Hub)
+#### 3. Flutter Client Submodule
+* **[clients/flutter/lib/services/api_service.dart](file:///home/harsh/Desktop/SahAI/SahAI/clients/flutter/lib/services/api_service.dart)**: Mapped static `baseUrl` to load from compile-time environment variables (`API_URL`) with fallback defaults for local execution.
+
+#### 4. Local Container Registries (Docker Hub)
 * **`harsh45ro/sahai-api-node:latest`**: Local image compiled and pushed to registry.
 * **`harsh45ro/sahai-engine-python:latest`**: Local image compiled and pushed to registry.
 * **`harsh45ro/sahai-ml-training:latest`**: Local image compiled and pushed to registry.
