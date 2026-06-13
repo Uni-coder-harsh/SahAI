@@ -261,4 +261,37 @@ This section documents the transition to enterprise-grade credential-safe loggin
 261: 
 262: #### 4. Flutter Web Client (`/clients/flutter/`)
 263: * **vercel.json**: Added standard SPA rewrite configurations to map all client requests to `index.html` to prevent Vercel CDN router failures.
+
+---
+
+## 🛑 BREAKPOINT: 2026-06-13T19:45:00Z | ID: DOCKER_GHA_FIX_8D9E
+
+## 📦 GitHub Actions Fix, Docker Registry Pushes & Hosting Stack Clarification
+
+This section documents the configuration and execution of local and remote Docker pipeline processes, the resolution of GitHub Actions environment variables and secrets scopes, and the hosting architecture mappings.
+
+### 📋 Task List & Status
+
+| Task / Feature | Status | Implementation Details |
+| :--- | :--- | :--- |
+| **GitHub Actions Fix** | Completed | Added `environment: SahAI` scope context to `build-and-push` job and mapped `DOCKER_USERNAME` to `${{ vars.DOCKER_USERNAME }}` (Environment Variable context). |
+| **Local Docker Hub Pushes** | Completed | Successfully compiled and pushed local containers `sahai-api-node`, `sahai-engine-python`, and `sahai-ml-training` to Docker Hub repository under user namespace `harsh45ro`. |
+| **TruffleHog False Positive Bypass** | Completed | Cleaned up dummy credentials placeholder in `README.md` to prevent TruffleHog secrets scanner pipeline validation failures. |
+| **Hosting Stack Clarification** | Completed | Provided detailed architectural maps distinguishing between Docker containerization, Vercel frontend SPA hosting, and Railway backend container provisioning. |
+
+---
+
+### 📂 Summary of New Changes
+
+#### 1. CI/CD Pipeline & Documentation (`/` root)
+* **[.github/workflows/ci-cd.yml](file:///home/harsh/Desktop/SahAI/SahAI/.github/workflows/ci-cd.yml)**: 
+  * Added `environment: SahAI` to ensure environment variables are exposed to jobs.
+  * Mapped username authentication specifically to `${{ vars.DOCKER_USERNAME }}` rather than secrets.
+* **[README.md](file:///home/harsh/Desktop/SahAI/SahAI/README.md)**: Updated mock DB connections placeholder to prevent false positive security scans.
+* **[progress.md](file:///home/harsh/Desktop/SahAI/SahAI/progress.md)**: Appended current progress and deployment clarifications.
+
+#### 2. Local Container Registries (Docker Hub)
+* **`harsh45ro/sahai-api-node:latest`**: Local image compiled and pushed to registry.
+* **`harsh45ro/sahai-engine-python:latest`**: Local image compiled and pushed to registry.
+* **`harsh45ro/sahai-ml-training:latest`**: Local image compiled and pushed to registry.
 264: 
