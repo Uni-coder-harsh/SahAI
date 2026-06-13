@@ -283,6 +283,7 @@ This section documents the configuration and execution of local and remote Docke
 | **Docker Path Traversal Fix** | Completed | Replaced static `.parents[3]` lookups in Python backend configs (`train.py` and `config.py`) with robust parent-traversing searches to prevent Docker container crashes. |
 | **Secure API URL Injection** | Completed | Mapped Flutter API endpoints to utilize `String.fromEnvironment('API_URL')` for compile-time base URL injection. Configured `.github/workflows/ci-cd.yml` to inject the Railway API endpoint via `--dart-define=API_URL`. |
 | **Node API Redis TLS Bypass** | Completed | Updated `services/api-node/src/queue/producer.js` to automatically convert remote connections to `rediss://` and configure TLS client options (`rejectUnauthorized: false`) preventing socket teardowns. |
+| **Client Debug Console Logging** | Completed | Injected verbose network request and response `print` statements in `api_service.dart` to output connection details, response codes, and data payloads to the browser console. |
 
 ---
 
@@ -307,7 +308,9 @@ This section documents the configuration and execution of local and remote Docke
 * **[services/api-node/src/queue/producer.js](file:///home/harsh/Desktop/SahAI/SahAI/services/api-node/src/queue/producer.js)**: Configured client connection options to automatically parse/upgrade remote strings and enforce TLS settings.
 
 #### 4. Flutter Client Submodule
-* **[clients/flutter/lib/services/api_service.dart](file:///home/harsh/Desktop/SahAI/SahAI/clients/flutter/lib/services/api_service.dart)**: Mapped static `baseUrl` to load from compile-time environment variables (`API_URL`) with fallback defaults for local execution.
+* **[clients/flutter/lib/services/api_service.dart](file:///home/harsh/Desktop/SahAI/SahAI/clients/flutter/lib/services/api_service.dart)**: 
+  * Mapped static `baseUrl` to load from compile-time environment variables (`API_URL`) with fallback defaults for local execution.
+  * Added `_safeJsonDecode` parsing and print logs for request/response bodies and connection status values.
 
 #### 5. Local Container Registries (Docker Hub)
 * **`harsh45ro/sahai-api-node:latest`**: Local image compiled and pushed to registry.
