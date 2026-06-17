@@ -412,3 +412,43 @@ This section documents the removal of the Flutter submodule and client codebase,
 * **[src/components/SkillMeshScreen.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/SkillMeshScreen.jsx)**: Resolved JSX compile error by escaping unescaped comparison symbols, fixing Vercel/CI-CD deploy failures.
 * **[src/components/](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/)**: Added the modular screen controllers (`AuthScreen.jsx`, `PersonalizeScreen.jsx`, `InitialTestScreen.jsx`, `DashboardScreen.jsx`, `SkillMeshScreen.jsx`, `SandboxScreen.jsx`, `FailureReportScreen.jsx`, `ProfileScreen.jsx`).
 
+---
+
+## 🛑 BREAKPOINT: 2026-06-17T15:50:00Z | ID: REDIS_HISTORY_UPDATES_F0E9
+
+## 📦 Upstash Redis Spike Mitigation, Dynamic Attempt History & Real-Time Skill Mesh Sync
+
+This section documents the mitigation of the Upstash Redis command spikes, connection socket keep-alive additions, dynamic attempt history SQL query enhancements (with option misconceptions nested string aggregations), React failure logs rendering dynamically via API rather than local storage, and retry configuration of uncompleted practice questions.
+
+### 📋 Task List & Status
+
+| Task / Feature | Status | Implementation Details |
+| :--- | :--- | :--- |
+| **Mitigate Upstash Redis Request Spikes** | Completed | Modified the Python telemetry worker queue polling connection handling. Added a `time.sleep(5)` backoff retry delay when catching exceptions in the queue consumer loop, preventing high-frequency reconnection loops. |
+| **Enable Redis Connection Keep-Alives** | Completed | Added `socket_keepalive=True` in python `connect_redis()` instantiation to keep TCP sockets open and reduce keep-alive reconnect cycles. |
+| **Optimize Queue Poll Timeout** | Completed | Increased the Redis queue `blpop` blocker timeout from `5s` to `30s` to significantly decrease command/polling frequency. |
+| **Aggregate Misconceptions via SQL** | Completed | Enhanced the `getAttemptHistory` database handler in `question.controller.js` to return option misconceptions using a nested subquery string aggregation (`string_agg`). |
+| **Dynamic Failure Logs Screen** | Completed | Updated `FailureReportScreen.jsx` to load incorrect question history dynamically using the `api.fetchAttemptHistory` API helper instead of checking `localStorage`. Split comma-separated string misconceptions back into array format. |
+| **Robust Icon Rendering** | Completed | Imported the missing `X` icon component from `lucide-react` in `FailureReportScreen.jsx` to avoid client rendering crashes. |
+| **Practice Retry Routing** | Completed | Configured `getPracticeQuestions` inside the node gateway controller to only exclude questions answered CORRECTLY (`is_correct = TRUE`), so users can re-practice and retry incorrect ones. |
+
+---
+
+### 📂 Summary of New Changes
+
+#### 1. Python Math Inference Worker (`/services/engine-python/`)
+* **[src/database/db_connector.py](file:///home/harsh/Desktop/SahAI/SahAI/services/engine-python/src/database/db_connector.py)**: Added `socket_keepalive=True` inside `connect_redis()` parameters.
+* **[src/jobs_queue/job_consumer.py](file:///home/harsh/Desktop/SahAI/SahAI/services/engine-python/src/jobs_queue/job_consumer.py)**: Increased `blpop` timeout to `30`. Added custom exception catch blocks that sleep for `5s` on redis connection or loop errors to prevent tight reconnect loops.
+
+#### 2. Node.js API Gateway (`/services/api-node/`)
+* **[src/controllers/question.controller.js](file:///home/harsh/Desktop/SahAI/SahAI/services/api-node/src/controllers/question.controller.js)**:
+  * Modified `getAttemptHistory` to aggregate and return option concept misconceptions via `string_agg`.
+  * Updated practice recommendation queries (`questionsQuery` and `fallbackQuery`) to exclude only correctly answered questions (`is_correct = TRUE`).
+
+#### 3. React Web Client (`/clients/react/`)
+* **[src/components/FailureReportScreen.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/FailureReportScreen.jsx)**:
+  * Dynamic history loader calling `api.fetchAttemptHistory` inside `useEffect`.
+  * Parsed and split misconceptions from `string_agg` CSV format into arrays.
+  * Added `X` icon import from `lucide-react`.
+  * Configured dynamic loading placeholders during data fetching.
+
