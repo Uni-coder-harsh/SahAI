@@ -127,3 +127,10 @@ CREATE TABLE IF NOT EXISTS user_question_responses (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- MNC-Grade DBMS Performance Indexing
+CREATE INDEX IF NOT EXISTS idx_uqr_user_question ON user_question_responses(user_id, question_id, is_correct);
+CREATE INDEX IF NOT EXISTS idx_options_question ON options(question_id);
+CREATE INDEX IF NOT EXISTS idx_concept_links_q ON question_concept_links(question_id);
+CREATE INDEX IF NOT EXISTS idx_misconceptions_opt ON option_concept_misconceptions(option_id);
+CREATE INDEX IF NOT EXISTS idx_dag_edges_target ON advanced_dag_edges(target_node);
+
