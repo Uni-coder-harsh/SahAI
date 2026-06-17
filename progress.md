@@ -483,3 +483,33 @@ This section documents the total elimination of continuous background Redis queu
 #### 3. Monorepo Configurations (`/` root)
 * **[docker-compose.yml](file:///home/harsh/Desktop/SahAI/SahAI/docker-compose.yml)**: Exposed port 5000 on `engine-python` and mapped container networks.
 
+---
+
+## 🛑 BREAKPOINT: 2026-06-18T00:20:00Z | ID: SANDBOX_REFACTOR_A1B2
+
+## 📦 Sandbox Refactoring, Deployed API 404 Route Fixes & Remedial Tip Updates
+
+This section documents the integration of the coding sandbox and handwriting OCR uploader directly into the question solving flow, removing the standalone sandbox page, fixing the deployed API route 404 issue on Railway, and cleanup of the failure logs remedial messages.
+
+### 📋 Task List & Status
+
+| Task / Feature | Status | Implementation Details |
+| :--- | :--- | :--- |
+| **Remove Standalone Sandbox** | Completed | Deleted the "Code Sandbox" tab from the sidebar and navigation, and removed the `/sandbox` route mapping from [App.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/App.jsx). |
+| **Integrate Solver Sandbox** | Completed | Integrated two standalone tabs inside the solver modal in [QuestionBankScreen.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/QuestionBankScreen.jsx): **Code Scratchpad** (for typing and compiling code) and **Handwriting Scanner** (for uploading and scanning handwritten notes). |
+| **Fix Deployed API 404 Routes** | Completed | Modified [services/api-node/src/config/index.js](file:///home/harsh/Desktop/SahAI/SahAI/services/api-node/src/config/index.js) to fall back to the Railway private service network DNS (`http://engine-python.railway.internal:5000`) in production. Pushed submodule commits to trigger Railway/Vercel rebuilding. |
+| **Remedial Logs Cleanup** | Completed | Updated [FailureReportScreen.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/FailureReportScreen.jsx) to fix the default fallback tip to point users to the Question Bank solver rather than referencing the deleted standalone Sandbox page. |
+
+---
+
+### 📂 Summary of New Changes
+
+#### 1. Node.js API Gateway (`/services/api-node/`)
+* **[src/config/index.js](file:///home/harsh/Desktop/SahAI/SahAI/services/api-node/src/config/index.js)**: Configured a dynamic production DNS fallback targeting the Python engine privately on Railway when running inside container environments.
+
+#### 2. React Web Client (`/clients/react/`)
+* **[src/App.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/App.jsx)**: Cleaned up sandbox routes, imports, and navigation buttons.
+* **[src/components/QuestionBankScreen.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/QuestionBankScreen.jsx)**: Built a tabbed panel inside the LeetCode-style Question Bank solver modal separating the code scratchpad from the handwriting image uploader.
+* **[src/components/FailureReportScreen.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/FailureReportScreen.jsx)**: Updated default fallback tip strings to match the new integrated scratchpad model.
+
+
