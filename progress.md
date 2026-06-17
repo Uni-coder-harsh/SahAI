@@ -365,4 +365,48 @@ This section documents the debugging and resolution of runtime errors during cli
 * **Submodule Commit (API Gateway)**: [87b9a22](https://github.com/Uni-coder-harsh/sahai-api-node/commit/87b9a22e8db925bdf93982c4396d31efa0443aca) (*"fix(redis): enforce rediss secure protocol and tls options for remote queues"*)
 * **Parent Monorepo Commit (Master Sync)**: [f132499](https://github.com/Uni-coder-harsh/SahAI/commit/f132499ad88d925bdf93982c4396d31efa0443aca) (*"fix(ci): update clients/flutter submodule pointer and progress for debug logging"*)
 
+---
 
+## 🛑 BREAKPOINT: 2026-06-17T14:45:00Z | ID: REACT_MIGRATION_88FF
+
+## 📦 Flutter Setup Removal & React/MERN stack Web Client Migration
+
+This section documents the removal of the Flutter submodule and client codebase, the generation of a Vite React web client, the configuration of the Express Gateway to serve the new built static folder, and updates to Vercel routing configurations and CI/CD pipelines.
+
+### 📋 Task List & Status
+
+| Task / Feature | Status | Implementation Details |
+| :--- | :--- | :--- |
+| **Remove Flutter Client Submodule** | Completed | De-registered and removed the `clients/flutter` submodule from the monorepo using Git. |
+| **Initialize Vite React Application** | Completed | Scaffolding Vite React client inside `clients/react` with JS template. Installed Lucide icon assets. |
+| **Implement Design System & CSS** | Completed | Designed custom theme variables in `src/index.css` featuring dark radial gradients, glassmorphism containers, animated elements, and Outfit typography. |
+| **Auth Screen Controller** | Completed | Built `AuthScreen.jsx` supporting login/registration switching, input verifications, validation banners, and secure local session storage. |
+| **Cognitive Personalization Screen** | Completed | Created `PersonalizeScreen.jsx` matching academic stream, semester, and GATE target selections, with non-CS domain warnings showing: *"we are still in progress with your domain..."* |
+| **Diagnostic Initial Testing Modules** | Completed | Developed `InitialTestScreen.jsx` tracking answer response times and publishing telemetry packets to math queues. |
+| **Intelligent Tutoring Dashboard** | Completed | Created `DashboardScreen.jsx` summarizing mastery levels, focus topics, recommended practice sprints, and overlay MCQ practice views. |
+| **SVG Skill Mesh Graph** | Completed | Built `SkillMeshScreen.jsx` displaying Python subtopics in an interactive nodes network, drawing prerequisites dynamically based on weights. |
+| **Code Sandbox Compiler IDE** | Completed | Built `SandboxScreen.jsx` with active concept selectors, code editor terminals, running compilers simulators, and mobile OCR scanning uploads. |
+| **Wrong Answers Failure Analyzer** | Completed | Programmed `FailureReportScreen.jsx` indexing incorrect question records, showing chosen options, correct answers, and cognitive misconception advice. |
+| **Student Profiles Settings** | Completed | Configured `ProfileScreen.jsx` visualizing degree metadata, and allowing users to customize their gateway API URL settings to bypass URL redirection errors. |
+| **API Gateway React Static Serving** | Completed | Patched `services/api-node/src/app.js` to serve compiled React client assets statically from `clients/react/dist`. |
+| **Vercel SPA Route Rewrites** | Completed | Added rewrite configurations in `clients/react/vercel.json` mapping all sub-routes to `index.html` to avoid Vercel route 404s. |
+| **Vite React CI/CD Pipeline Build** | Completed | Updated GitHub Actions workflows in `.github/workflows/ci-cd.yml` to compile and package React build-time modules instead of Flutter code. |
+
+---
+
+### 📂 Summary of New Changes
+
+#### 1. Repository Cleanups & Configurations (`/` root)
+* **[.github/workflows/ci-cd.yml](file:///home/harsh/Desktop/SahAI/SahAI/.github/workflows/ci-cd.yml)**: Replaced Flutter Action installs and builds with Node setup, `npm ci`, and `npm run build` steps deploying `clients/react/dist` to Vercel.
+* **[.gitmodules](file:///home/harsh/Desktop/SahAI/SahAI/.gitmodules)**: Automatically updated to exclude the `clients/flutter` submodule.
+
+#### 2. Node.js API Gateway (`/services/api-node/`)
+* **[src/app.js](file:///home/harsh/Desktop/SahAI/SahAI/services/api-node/src/app.js)**: Configured Express to serve the `clients/react/dist` build folder and index routes.
+
+#### 3. React Web Client (`/clients/react/`)
+* **[vercel.json](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/vercel.json)**: Rewrites rules redirecting request paths back to `index.html`.
+* **[index.html](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/index.html)**: Branded custom document title to `SahAI`.
+* **[src/App.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/App.jsx)**: Session restoring layout coordinating Auth, Onboarding/Personalization, Initial Tests, and main tab navigation screens.
+* **[src/services/api.js](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/services/api.js)**: Central HTTP fetch client managing custom Base URL override caches, token authorization headers, and backend requests.
+* **[src/index.css](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/index.css)**: Central theme stylesheet configuring dark styles, inputs, badges, IDE layouts, and transitions.
+* **[src/components/](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/)**: Added the modular screen controllers (`AuthScreen.jsx`, `PersonalizeScreen.jsx`, `InitialTestScreen.jsx`, `DashboardScreen.jsx`, `SkillMeshScreen.jsx`, `SandboxScreen.jsx`, `FailureReportScreen.jsx`, `ProfileScreen.jsx`).

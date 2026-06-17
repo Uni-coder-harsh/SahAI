@@ -120,16 +120,17 @@ jobs:
         submodules: recursive
         token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Set up Flutter
-      uses: subosito/flutter-action@v2
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
       with:
-        channel: 'stable'
+        node-version: 22.x
 
-    - name: Build Flutter Web
+    - name: Build React Web
       run: |
-        cd clients/flutter
-        flutter build web --release --dart-define=API_URL=${{ vars.API_URL }}
-        cp vercel.json build/web/
+        cd clients/react
+        npm ci
+        VITE_API_URL="${{ vars.API_URL }}" npm run build
+        cp vercel.json dist/
 
     - name: Deploy to Vercel
       uses: amondnet/vercel-action@v20
@@ -137,6 +138,6 @@ jobs:
         vercel-token: ${{ secrets.VERCEL_TOKEN }}
         vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
         vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-        working-directory: clients/flutter/build/web
+        working-directory: clients/react/dist
         vercel-args: '--prod'
 

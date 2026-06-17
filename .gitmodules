@@ -7,6 +7,3 @@
 [submodule "services/engine-python"]
 	path = services/engine-python
 	url = git@github.com:Uni-coder-harsh/sahai-engine-python.git
-[submodule "clients/flutter"]
-	path = clients/flutter
-	url = git@github.com:Uni-coder-harsh/sahai-client-flutter.git
