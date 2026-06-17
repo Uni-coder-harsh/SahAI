@@ -452,3 +452,34 @@ This section documents the mitigation of the Upstash Redis command spikes, conne
   * Added `X` icon import from `lucide-react`.
   * Configured dynamic loading placeholders during data fetching.
 
+---
+
+## 🛑 BREAKPOINT: 2026-06-17T16:15:00Z | ID: REDIS_IDLE_BYPASS_D3D1
+
+## 📦 Zero-Idle Redis Cost Optimization & Direct HTTP Telemetry Delivery
+
+This section documents the total elimination of continuous background Redis queue polling to save Upstash Redis usage and keep Redis idle connections at zero when the platform is not in use.
+
+### 📋 Task List & Status
+
+| Task / Feature | Status | Implementation Details |
+| :--- | :--- | :--- |
+| **Replace Redis Queuing with HTTP** | Completed | Replaced the Node.js API Redis producer queue in `producer.js` with a zero-dependency HTTP POST notification call directly relaying events to the Python engine. |
+| **Expose Python Telemetry HTTP Server** | Completed | Modified `main.py` in the Python engine to run a lightweight, built-in HTTP server on port 5000 (`/process-telemetry` and `/health` endpoints) instead of a continuous Redis queue consumer worker loop. |
+| **Container Networking Configuration** | Completed | Configured `docker-compose.yml` to inject `ENGINE_PYTHON_URL` to `api-node` and exposed port 5000 for local development. |
+| **Synchronous Real-time updates** | Completed | The telemetry processing is now fully synchronous within the question submission API request workflow, meaning mastery values are immediately updated when user fetches updated states. |
+
+---
+
+### 📂 Summary of New Changes
+
+#### 1. Node.js API Gateway (`/services/api-node/`)
+* **[src/config/index.js](file:///home/harsh/Desktop/SahAI/SahAI/services/api-node/src/config/index.js)**: Configured `ENGINE_PYTHON_URL` environment variable.
+* **[src/queue/producer.js](file:///home/harsh/Desktop/SahAI/SahAI/services/api-node/src/queue/producer.js)**: Overwrote to remove all Redis client initialization and instead fetch-POST telemetry objects directly to the Python server.
+
+#### 2. Python Math Inference Worker (`/services/engine-python/`)
+* **[src/main.py](file:///home/harsh/Desktop/SahAI/SahAI/services/engine-python/src/main.py)**: Replaced continuous queue polling block with a built-in HTTPServer, routing `/process-telemetry` directly to the telemetry evaluator consumer.
+
+#### 3. Monorepo Configurations (`/` root)
+* **[docker-compose.yml](file:///home/harsh/Desktop/SahAI/SahAI/docker-compose.yml)**: Exposed port 5000 on `engine-python` and mapped container networks.
+

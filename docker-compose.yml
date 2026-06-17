@@ -60,6 +60,7 @@ services:
       - ./ENV/.env
     environment:
       - NODE_ENV=development
+      - ENGINE_PYTHON_URL=http://engine-python:5000
     depends_on:
       postgres:
         condition: service_healthy
@@ -74,6 +75,8 @@ services:
       context: ./services/engine-python
       dockerfile: Dockerfile
     container_name: sahai-engine-python
+    ports:
+      - "5000:5000"
     env_file:
       - ./ENV/.env
     environment:
