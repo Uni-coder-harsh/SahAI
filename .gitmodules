@@ -7,3 +7,8 @@
 [submodule "services/engine-python"]
 	path = services/engine-python
 	url = git@github.com:Uni-coder-harsh/sahai-engine-python.git
+
+[submodule "clients/react"]
+	path = clients/react
+	url = git@github.com:Uni-coder-harsh/sahai-client-react.git
+

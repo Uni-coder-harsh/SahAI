@@ -406,7 +406,9 @@ This section documents the removal of the Flutter submodule and client codebase,
 #### 3. React Web Client (`/clients/react/`)
 * **[vercel.json](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/vercel.json)**: Rewrites rules redirecting request paths back to `index.html`.
 * **[index.html](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/index.html)**: Branded custom document title to `SahAI`.
-* **[src/App.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/App.jsx)**: Session restoring layout coordinating Auth, Onboarding/Personalization, Initial Tests, and main tab navigation screens.
-* **[src/services/api.js](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/services/api.js)**: Central HTTP fetch client managing custom Base URL override caches, token authorization headers, and backend requests.
+* **[src/App.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/App.jsx)**: Session restoring layout coordinating Auth, Onboarding/Personalization, Initial Tests, and main tab navigation screens. Configured a self-healing API Gateway connection configuration error gate.
+* **[src/services/api.js](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/services/api.js)**: Central HTTP fetch client managing custom Base URL override caches. Removed all localhost fallbacks.
 * **[src/index.css](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/index.css)**: Central theme stylesheet configuring dark styles, inputs, badges, IDE layouts, and transitions.
+* **[src/components/SkillMeshScreen.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/SkillMeshScreen.jsx)**: Resolved JSX compile error by escaping unescaped comparison symbols, fixing Vercel/CI-CD deploy failures.
 * **[src/components/](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/)**: Added the modular screen controllers (`AuthScreen.jsx`, `PersonalizeScreen.jsx`, `InitialTestScreen.jsx`, `DashboardScreen.jsx`, `SkillMeshScreen.jsx`, `SandboxScreen.jsx`, `FailureReportScreen.jsx`, `ProfileScreen.jsx`).
+
