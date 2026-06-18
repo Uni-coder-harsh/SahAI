@@ -526,6 +526,7 @@ This section documents the integration of client-side HashRouter to resolve path
 | :--- | :--- | :--- |
 | **Vite Variable Scope Fix** | Completed | Renamed local variable `url` to `apiUrl` in `getBaseUrl` function inside `clients/react/src/services/api.js` to prevent minification name collision crashing the application on load. |
 | **Vercel Hash Routing Migration** | Completed | Swapped out `BrowserRouter` for `HashRouter` inside `clients/react/src/main.jsx` to resolve 404/blank page router errors on static page direct navigations and refreshes. |
+| **JSX LaTeX Brackets Escape** | Completed | Replaced LaTeX-style formula `($W_{diag} = 0.65$)` with a simple text string `(W_diag = 0.65)` in `GuestLandingScreen.jsx` to prevent JSX from evaluating the brackets as a JavaScript statement. |
 | **Live ML Inference Bridge** | Completed | Loaded scikit-learn Random Forest model (`telemetry_rf_v1.pkl`) at startup in `services/engine-python/src/models/bayesian_network.py` and routed live behavior predictions mapping exact training parameters order. |
 | **Python Dependency Expansion** | Completed | Added `scikit-learn` and `joblib` into `services/engine-python/requirements.txt` to enable loading and using pickled ML classifiers. |
 
@@ -536,6 +537,7 @@ This section documents the integration of client-side HashRouter to resolve path
 #### 1. React Web Client (`/clients/react/`)
 * **[src/services/api.js](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/services/api.js)**: Renamed variable `url` to `apiUrl` to avoid minification ReferenceErrors.
 * **[src/main.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/main.jsx)**: Upgraded from `BrowserRouter` to `HashRouter` wrapping routing.
+* **[src/components/GuestLandingScreen.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/GuestLandingScreen.jsx)**: Replaced unescaped LaTeX curly brace formula causing browser `ReferenceError: diag is not defined` crash.
 
 #### 2. Python Inference Engine (`/services/engine-python/`)
 * **[requirements.txt](file:///home/harsh/Desktop/SahAI/SahAI/services/engine-python/requirements.txt)**: Configured dependencies for `scikit-learn` and `joblib`.
