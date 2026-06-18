@@ -512,4 +512,35 @@ This section documents the integration of the coding sandbox and handwriting OCR
 * **[src/components/QuestionBankScreen.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/QuestionBankScreen.jsx)**: Built a tabbed panel inside the LeetCode-style Question Bank solver modal separating the code scratchpad from the handwriting image uploader.
 * **[src/components/FailureReportScreen.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/FailureReportScreen.jsx)**: Updated default fallback tip strings to match the new integrated scratchpad model.
 
+---
+
+## 🛑 BREAKPOINT: 2026-06-18T16:40:00Z | ID: ML_BRIDGE_ROUTING_FIX_C3D4
+
+## 📦 React Minification & Hash Routing Fix, Python Live ML Inference integration
+
+This section documents the integration of client-side HashRouter to resolve path reloads on Vercel, renaming conflicting url variables inside getBaseUrl to avoid minification ReferenceError crashes on load, and adding the live Random Forest model prediction loader inside the Python Bayesian math worker.
+
+### 📋 Task List & Status
+
+| Task / Feature | Status | Implementation Details |
+| :--- | :--- | :--- |
+| **Vite Variable Scope Fix** | Completed | Renamed local variable `url` to `apiUrl` in `getBaseUrl` function inside `clients/react/src/services/api.js` to prevent minification name collision crashing the application on load. |
+| **Vercel Hash Routing Migration** | Completed | Swapped out `BrowserRouter` for `HashRouter` inside `clients/react/src/main.jsx` to resolve 404/blank page router errors on static page direct navigations and refreshes. |
+| **Live ML Inference Bridge** | Completed | Loaded scikit-learn Random Forest model (`telemetry_rf_v1.pkl`) at startup in `services/engine-python/src/models/bayesian_network.py` and routed live behavior predictions mapping exact training parameters order. |
+| **Python Dependency Expansion** | Completed | Added `scikit-learn` and `joblib` into `services/engine-python/requirements.txt` to enable loading and using pickled ML classifiers. |
+
+---
+
+### 📂 Summary of New Changes
+
+#### 1. React Web Client (`/clients/react/`)
+* **[src/services/api.js](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/services/api.js)**: Renamed variable `url` to `apiUrl` to avoid minification ReferenceErrors.
+* **[src/main.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/main.jsx)**: Upgraded from `BrowserRouter` to `HashRouter` wrapping routing.
+
+#### 2. Python Inference Engine (`/services/engine-python/`)
+* **[requirements.txt](file:///home/harsh/Desktop/SahAI/SahAI/services/engine-python/requirements.txt)**: Configured dependencies for `scikit-learn` and `joblib`.
+* **[src/models/bayesian_network.py](file:///home/harsh/Desktop/SahAI/SahAI/services/engine-python/src/models/bayesian_network.py)**: Enabled model unpickling on start and live predict execution.
+* **[models/telemetry_rf_v1.pkl](file:///home/harsh/Desktop/SahAI/SahAI/services/engine-python/models/telemetry_rf_v1.pkl)**: Placed active model weights binary into service subfolder.
+
+
 
