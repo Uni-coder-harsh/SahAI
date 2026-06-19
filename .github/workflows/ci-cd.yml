@@ -51,7 +51,8 @@ jobs:
 
     - name: Run Python Bayesian Math Tests
       run: |
-        PYTHONPATH=services/engine-python/src pytest services/engine-python/tests/test_math.py
+        PYTHONPATH=services/engine-python/src pytest services/engine-python/tests/
+
 
   build-and-push:
     name: Build & Push Microservices
