@@ -1,0 +1,43 @@
+=== OCR AND LLM SERVICE LOGS (2026-06-19) ===
+[DEVELOPER DEBUG] Received OCR_HANDWRITING telemetry payload.
+Event ID: 3c1b7e0d-eb29-4d40-b546-402a9ef3aab4
+User ID: 3ad0e2a6-1e06-494f-b8d0-cc697d7bdbaa
+Question ID: de30e000-0000-0000-0000-000000000000
+Input Node ID: PY_OOP_01
+Image uploaded: YES (Base64 length: 165083 chars)
+Running OCR extraction pipeline...
+Starting OCR Handwriting Text Extraction Pipeline
+GROQ_API_KEY not found in environment. Skipping Vision OCR and running local Tesseract OCR...
+Decoded image size: 123794 bytes
+PIL Image loaded successfully. Size: (1247, 1600)
+Starting auto-rotation check (testing angles: 0, 90, 180, 270 degrees)...
+Testing image rotation: 0 degrees...
+  -> Extracted text length: 89 chars. Python score: 121
+Testing image rotation: 90 degrees...
+  -> Extracted text length: 115 chars. Python score: 140
+Testing image rotation: 180 degrees...
+  -> Extracted text length: 100 chars. Python score: 0
+Testing image rotation: 270 degrees...
+  -> Extracted text length: 105 chars. Python score: 0
+Auto-rotation evaluation complete. Selected best angle: 90 degrees (Score: 140)
+OCR Pipeline SUCCESS! Extracted text length: 115 chars.
+
+Parsed Note Code (Tesseract Raw):
+de! init —Céel} reKe, moclal )!
+Sel. prnke = mele
+col Get ACSCNottaW COMP) “
+NOtuAN > * € Seip canto sel: mala” "
+
+Original Intended Code:
+class Car:
+    def __init__(self, make, model):
+        self.make = make
+        self.model = model
+    
+    def get_description(self):
+        return f"{self.make} {self.model}"
+
+LLM Connection Status: FAILED
+LLM Grader failed: Both primary (Groq) and fallback (OpenAI) LLM services failed to produce a valid response.
+[ERROR] LLM evaluation failed: Both primary (Groq) and fallback (OpenAI) LLM services failed to produce a valid response.
+(Note: Likely caused by API keys not being exposed to the Railway runtime/github variables during deploy).
