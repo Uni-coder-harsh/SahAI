@@ -882,3 +882,4 @@ This section documents the migration of the detailed Cognitive Diagnostics & Beh
 
 #### 2. Python Engine Service (`services/engine-python/`)
 * **[src/models/bayesian_network.py](file:///home/harsh/Desktop/SahAI/SahAI/services/engine-python/src/models/bayesian_network.py)**: Tuned learning rate modifier update parameters for copy-paste (`0.5`), guessing (`0.5`), foundational void (`0.5`), shotgun debugging (`0.8`), and anxious overworking (`0.95`).
+* **[tests/test_math.py](file:///home/harsh/Desktop/SahAI/SahAI/services/engine-python/tests/test_math.py)**: Updated Bayesian test assertions to verify correct calculations under the new 50% copy-paste penalty scale.
