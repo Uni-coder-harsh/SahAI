@@ -32,6 +32,7 @@ def drop_all_tables(cur):
     print("[Schema Exec] Dropping all existing tables to start fresh...")
     cur.execute(
         """
+        DROP TABLE IF EXISTS user_handwriting_responses CASCADE;
         DROP TABLE IF EXISTS user_question_responses CASCADE;
         DROP TABLE IF EXISTS option_concept_misconceptions CASCADE;
         DROP TABLE IF EXISTS question_concept_links CASCADE;

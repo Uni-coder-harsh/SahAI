@@ -134,3 +134,17 @@ CREATE INDEX IF NOT EXISTS idx_concept_links_q ON question_concept_links(questio
 CREATE INDEX IF NOT EXISTS idx_misconceptions_opt ON option_concept_misconceptions(option_id);
 CREATE INDEX IF NOT EXISTS idx_dag_edges_target ON advanced_dag_edges(target_node);
 
+-- 7. Student Handwriting Performance Logs
+CREATE TABLE IF NOT EXISTS user_handwriting_responses (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    question_id UUID REFERENCES questions(id) ON DELETE CASCADE,
+    ocr_extracted_text TEXT,
+    llm_logical_flaw TEXT,
+    failed_node_id VARCHAR(100) REFERENCES concept_nodes(node_id) ON DELETE SET NULL,
+    is_correct BOOLEAN,
+    time_spent_seconds INT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_uhr_user_question ON user_handwriting_responses(user_id, question_id);
