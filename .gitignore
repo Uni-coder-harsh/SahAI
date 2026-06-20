@@ -38,4 +38,5 @@ progress.md
 setup_android_sdk.sh
 commands.md
 gddd.md
+ocr_debug_failures.log
 
