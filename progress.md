@@ -831,4 +831,29 @@ This section documents the integration of the real-time translucent floating ter
 * **[src/controllers/user.controller.js](file:///home/harsh/Desktop/SahAI/SahAI/services/api-node/src/controllers/user.controller.js)**: Added Cache-Control headers to `getCognitiveState` endpoint.
 * **[src/controllers/curriculum.controller.js](file:///home/harsh/Desktop/SahAI/SahAI/services/api-node/src/controllers/curriculum.controller.js)**: Added Cache-Control headers to `getCurriculum` endpoint.
 
+## 🛑 BREAKPOINT: 2026-06-20T14:15:00+05:30 | ID: B2B2C_INSTITUTIONAL_ACCESS
+
+## 📦 B2B2C Institutional Portal & Student Dashboard Expected Mastery Responsiveness
+
+This section documents the integration of the B2B2C "Institute Portal" entry points, HOD approval views, cohort aggregate weakness visualizations, and responsiveness adjustments to student dashboard mastery parameters.
+
+### 📋 Task List & Status
+
+| Task / Feature | Status | Implementation Details |
+| :--- | :--- | :--- |
+| **Institute Entry Points** | Completed | Added secondary login buttons pointing directly to `/institute/dashboard` inside both the header navigation and hero section of the landing page to provide immediate entry for admins/faculty. |
+| **HOD Dashboard Workspace** | Completed | Created the `/institute/dashboard` workspace designed for a CSE Head of Department. Integrates a role approvals table where administrators can review and approve pending faculty requests dynamically with toast alerts. |
+| **Cohort Force-Directed Graph** | Completed | Installed `react-force-graph-2d` and rendered an aggregate weakness mesh for a fake CSE cohort. The `CS_PY_POINTERS` node is sized large (value 45) and colored red to signal the class's critical bottleneck. |
+| **Dashboard Responsiveness Fix** | Completed | Configured student average mastery calculations inside `DashboardScreen.jsx` to dynamically target only active (practiced) concept nodes. Prevents Expected Mastery from remaining stuck at the baseline average of `46.6%` due to unpracticed nodes. |
+| **Sitemap & Simplified Messaging** | Completed | Restructured the Guest Landing screen to clearly distinguish adaptive student paths from institutional tenancy features (domain whitelisting SuperAdmin approvals). |
+
+### 📂 Summary of New Changes
+
+#### 1. React Web Client (`clients/react/`)
+* **[src/components/InstituteDashboardScreen.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/InstituteDashboardScreen.jsx)**: Created the HOD admin layout incorporating stats grids, approvals tables, and force graph canvases.
+* **[src/components/GuestLandingScreen.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/GuestLandingScreen.jsx)**: Added the portal login triggers and sitemap guides.
+* **[src/components/DashboardScreen.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/DashboardScreen.jsx)**: Refactored expected mastery metrics calculations to focus on practiced subtopics.
+* **[src/App.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/App.jsx)**: Registered the `/institute/dashboard` route.
+
+
 
