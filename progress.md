@@ -858,3 +858,27 @@ This section documents the integration of the B2B2C "Institute Portal" entry poi
 
 
 
+
+## 🛑 BREAKPOINT: 2026-06-20T15:20:00+05:30 | ID: COGNITIVE_DIAGNOSTICS_ISOLATION
+
+## 📦 Cognitive Diagnostics Separation, Sidebar Navigation & Reduced Bayesian Penalties
+
+This section documents the migration of the detailed Cognitive Diagnostics & Behavior Audit view off the student DashboardScreen to a dedicated private screen under `/diagnostics` accessible via a sidebar link, simplified cognitive strengths/weaknesses summary on the dashboard, and a reduction in Bayesian parameter penalties to ensure a fairer student learning experience.
+
+### 📋 Task List & Status
+
+| Task / Feature | Status | Implementation Details |
+| :--- | :--- | :--- |
+| **Separated Diagnostics Screen** | Completed | Registered `/diagnostics` path mapped to a dedicated `CognitiveDiagnosticsScreen.jsx` component. Links to it were added to the sidebar navigation menu in `App.jsx` using the `Activity` icon. |
+| **Dashboard Summary Performance Card** | Completed | Replaced the large diagnostics details section on the student dashboard with a simplified card displaying only the top 2 best topics (Mastery Strengths) and the top 2 worst topics (Key Focus Areas). Added a button redirecting the student to `/diagnostics`. |
+| **Reduced Bayesian Penalties** | Completed | Adjusted behavioral modifiers in `bayesian_network.py` to lower penalties. Plagiarism/guessing modifier increased to `0.5` (50% penalty, down from 65%/90%), Shotgun debugging modifier increased to `0.8` (20% penalty, down from 30%/50%), and Anxious overworking/misclick modifier increased to `0.95` (5% penalty, down from 10%/20%). Modified user-facing compliance texts on `/diagnostics` to match. |
+
+### 📂 Summary of New Changes
+
+#### 1. React Web Client (`clients/react/`)
+* **[src/App.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/App.jsx)**: Registered the new `/diagnostics` private route and integrated a sidebar navigation button.
+* **[src/components/DashboardScreen.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/DashboardScreen.jsx)**: Replaced the large diagnostics & behavior audit widget with a Top 2 Best/Worst topics summary card containing navigation link routing to `/diagnostics`.
+* **[src/components/CognitiveDiagnosticsScreen.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/CognitiveDiagnosticsScreen.jsx)**: Updated descriptions of behavior compliance rules to reflect 50% and 20% penalties respectively.
+
+#### 2. Python Engine Service (`services/engine-python/`)
+* **[src/models/bayesian_network.py](file:///home/harsh/Desktop/SahAI/SahAI/services/engine-python/src/models/bayesian_network.py)**: Tuned learning rate modifier update parameters for copy-paste (`0.5`), guessing (`0.5`), foundational void (`0.5`), shotgun debugging (`0.8`), and anxious overworking (`0.95`).
