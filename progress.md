@@ -852,8 +852,9 @@ This section documents the integration of the B2B2C "Institute Portal" entry poi
 #### 1. React Web Client (`clients/react/`)
 * **[src/components/InstituteDashboardScreen.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/InstituteDashboardScreen.jsx)**: Created the HOD admin layout incorporating stats grids, approvals tables, and force graph canvases.
 * **[src/components/GuestLandingScreen.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/GuestLandingScreen.jsx)**: Added the portal login triggers and sitemap guides.
-* **[src/components/DashboardScreen.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/DashboardScreen.jsx)**: Refactored expected mastery metrics calculations to focus on practiced subtopics.
+* **[src/components/DashboardScreen.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/components/DashboardScreen.jsx)**: Refactored expected mastery metrics calculations to focus on practiced subtopics and added a detailed Cognitive Diagnostics explainability card.
 * **[src/App.jsx](file:///home/harsh/Desktop/SahAI/SahAI/clients/react/src/App.jsx)**: Registered the `/institute/dashboard` route.
+
 
 
 
