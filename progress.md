@@ -50,6 +50,10 @@
 - **Status**: RESOLVED
 - **Details**: Created the `ProctorGuard.jsx` security wrapper in React. Implemented: (a) focus-loss screen obfuscation with glassmorphism overlays and auto-triggering `FOCUS_LOST` telemetry logs; (b) dynamic repeating watermarks displaying live timestamp and student ID attributes; (c) browser shortcut interception blocking DevTools (F12, Inspect), printing (Ctrl+P), cloning (Ctrl+C, Ctrl+S), and right-clicks; and (d) CSS selections protection. Wrapped the three core testing/solving components in `App.jsx`.
 
+### [TASK-011] vscode-sahai-lens Socratic VS Code Extension Scaffold
+- **Status**: RESOLVED
+- **Details**: Scaffolded and compiled a VS Code extension inside `extensions/vscode-sahai-lens`. Implemented: (a) secure authentication handshakes leveraging workspace configurations and status bar widgets; (b) active telemetry triggers recording edit duration, backspaces, and paste character counts; (c) background 60s asynchronous telemetry sync to the Node gateway `/api/telemetry/vscode` endpoint; and (d) Socratic hover diagnostics collections triggered on file saves, querying local Ollama (`codegemma:2b`) for inline feedback. Exposed the `/vscode` route on the Node API Gateway.
+
 ---
 
 ## Error & Bug Ledger
