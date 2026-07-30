@@ -61,6 +61,10 @@ services:
     environment:
       - NODE_ENV=development
       - ENGINE_PYTHON_URL=http://engine-python:5000
+      - PG_HOST=postgres
+      - PG_SSL=false
+      - REDIS_URL=redis://redis:6379
+      - MONGO_URI=mongodb://mongodb:27017/sahai
     depends_on:
       postgres:
         condition: service_healthy
@@ -81,6 +85,10 @@ services:
       - ./ENV/.env
     environment:
       - ENV_MODE=development
+      - PG_HOST=postgres
+      - PG_SSL=false
+      - REDIS_URL=redis://redis:6379
+      - MONGO_URI=mongodb://mongodb:27017/sahai
     depends_on:
       postgres:
         condition: service_healthy

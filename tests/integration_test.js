@@ -1,16 +1,44 @@
 const http = require('http');
+const crypto = require('crypto');
 
 const API_BASE = 'http://localhost:3000/api';
+const SECRET_KEY = 'Bayes_45Ro_Secret_Key_For_AES256_Encryption';
+const AES_SECRET_KEY = 'sahai-super-secret-key-123456789';
+
+function generateToken(userId) {
+  const key = crypto.scryptSync(SECRET_KEY, 'salt', 32);
+  const iv = Buffer.alloc(16, 0);
+  const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+  let encrypted = cipher.update(userId, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  return encrypted;
+}
+
+function encryptPayload(data, secretKey = AES_SECRET_KEY) {
+  const keyBuffer = Buffer.from(secretKey, 'utf8');
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv('aes-256-cbc', keyBuffer, iv);
+  let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  return {
+    iv: iv.toString('hex'),
+    encryptedData: encrypted
+  };
+}
 
 // Helper to make JSON requests
-function request(method, path, body = null) {
+function request(method, path, body = null, token = null) {
   return new Promise((resolve, reject) => {
     const url = `${API_BASE}${path}`;
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
     const options = {
       method,
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      headers
     };
     
     const req = http.request(url, options, (res) => {
@@ -71,29 +99,32 @@ async function runIntegrationTest() {
 
     // 3. Verify Initial Belief State
     console.log('\n[Step 3] Fetching initial cognitive state...');
-    const stateBefore = await request('GET', `/users/${userId}/cognitive-state`);
+    const token = generateToken(userId);
+    const stateBefore = await request('GET', `/users/${userId}/cognitive-state`, null, token);
     if (stateBefore.status !== 200) {
+      console.error('Error State Before:', stateBefore.body);
       throw new Error('Failed to fetch initial cognitive state.');
     }
     
-    // Check that we have initial CS_DS_ARRAYS state
-    const arrayNodeBefore = stateBefore.body.cognitive_state.find(n => n.node_id === 'CS_DS_ARRAYS');
-    console.log('Initial CS_DS_ARRAYS State:', arrayNodeBefore);
+    // Check that we have initial PY_CONTROL_01 state
+    const arrayNodeBefore = stateBefore.body.cognitive_state.find(n => n.node_id === 'PY_CONTROL_01');
+    console.log('Initial PY_CONTROL_01 State:', arrayNodeBefore);
     if (!arrayNodeBefore || parseFloat(arrayNodeBefore.expected_mastery) !== 0.5) {
       throw new Error('Initial expected mastery should be 0.50.');
     }
 
     // 4. Ingest Telemetry Event
-    console.log('\n[Step 4] Simulating telemetry ingestion (Successful attempt on CS_DS_ARRAYS)...');
-    const telemetryRes = await request('POST', '/telemetry', {
-      user_id: userId,
-      node_id: 'CS_DS_ARRAYS',
+    console.log('\n[Step 4] Simulating telemetry ingestion (Successful attempt on PY_CONTROL_01)...');
+    const telemetryPayload = {
+      node_id: 'PY_CONTROL_01',
       event_type: 'ATTEMPT',
       success: true,
       attempts: 1,
       behavioral_flags: [],
       time_spent_seconds: 45
-    });
+    };
+    const encryptedTelemetry = encryptPayload(telemetryPayload);
+    const telemetryRes = await request('POST', '/telemetry', encryptedTelemetry, token);
 
     console.log('Telemetry Response:', telemetryRes.body);
     if (telemetryRes.status !== 202) {
@@ -106,7 +137,7 @@ async function runIntegrationTest() {
 
     // 6. Fetch New Cognitive State and Verify
     console.log('\n[Step 6] Retrieving updated cognitive state...');
-    const stateAfter = await request('GET', `/users/${userId}/cognitive-state`);
+    const stateAfter = await request('GET', `/users/${userId}/cognitive-state`, null, token);
     if (stateAfter.status !== 200) {
       throw new Error('Failed to retrieve updated cognitive state.');
     }
@@ -116,27 +147,27 @@ async function runIntegrationTest() {
       stateMap[n.node_id] = n;
     });
 
-    const targetNode = stateMap['CS_DS_ARRAYS'];
-    console.log('Updated Target Node (CS_DS_ARRAYS):', targetNode);
+    const targetNode = stateMap['PY_CONTROL_01'];
+    console.log('Updated Target Node (PY_CONTROL_01):', targetNode);
     if (!targetNode || parseFloat(targetNode.expected_mastery) <= 0.5) {
       throw new Error('Target node expected mastery should have increased.');
     }
 
     // Check DAG Propagation to parent nodes
-    // CS_PROG_LOOPS is prerequisite of CS_DS_ARRAYS (correlation weight = 0.8)
-    // CS_PROG_VARIABLES is prerequisite of CS_DS_ARRAYS (correlation weight = 0.7)
-    const loopsParentNode = stateMap['CS_PROG_LOOPS'];
-    const varsParentNode = stateMap['CS_PROG_VARIABLES'];
+    // PY_DATA_07 is prerequisite of PY_CONTROL_01
+    // PY_DATA_08 is prerequisite of PY_CONTROL_01
+    const loopsParentNode = stateMap['PY_DATA_07'];
+    const varsParentNode = stateMap['PY_DATA_08'];
 
-    console.log('Propagated Parent Node (CS_PROG_LOOPS):', loopsParentNode);
-    console.log('Propagated Parent Node (CS_PROG_VARIABLES):', varsParentNode);
+    console.log('Propagated Parent Node (PY_DATA_07):', loopsParentNode);
+    console.log('Propagated Parent Node (PY_DATA_08):', varsParentNode);
 
     if (!loopsParentNode || parseFloat(loopsParentNode.expected_mastery) <= 0.5) {
-      throw new Error('Updates did not propagate to CS_PROG_LOOPS parent node.');
+      throw new Error('Updates did not propagate to PY_DATA_07 parent node.');
     }
 
     if (!varsParentNode || parseFloat(varsParentNode.expected_mastery) <= 0.5) {
-      throw new Error('Updates did not propagate to CS_PROG_VARIABLES parent node.');
+      throw new Error('Updates did not propagate to PY_DATA_08 parent node.');
     }
 
     console.log('\n=== INTEGRATION TEST PASSED SUCCESSFULLY ===');
