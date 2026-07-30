@@ -46,6 +46,10 @@
 - **Status**: RESOLVED
 - **Details**: Integrated the `gemma_orchestrator` loop directly into the BKT telemetry pipeline inside `job_consumer.py`, enabling Socratic diagnostics in both English and natural Hindi for every incorrect MCQ or Code submission. Redesigned the Coding Sandbox layout to lock the main container within the viewport (`overflow: hidden`), allowing Monaco Editor to stretch and scroll its content natively (`flex: 1`), and wrapped console logs and agent diagnostic results inside a collapsible tab sheet drawer.
 
+### [TASK-010] ProctorGuard Anti-Cheat Multi-Layer Proctoring Wrapper
+- **Status**: RESOLVED
+- **Details**: Created the `ProctorGuard.jsx` security wrapper in React. Implemented: (a) focus-loss screen obfuscation with glassmorphism overlays and auto-triggering `FOCUS_LOST` telemetry logs; (b) dynamic repeating watermarks displaying live timestamp and student ID attributes; (c) browser shortcut interception blocking DevTools (F12, Inspect), printing (Ctrl+P), cloning (Ctrl+C, Ctrl+S), and right-clicks; and (d) CSS selections protection. Wrapped the three core testing/solving components in `App.jsx`.
+
 ---
 
 ## Error & Bug Ledger
