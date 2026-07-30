@@ -2,6 +2,11 @@
 import os
 import sys
 import json
+from dotenv import load_dotenv
+
+# Load env configurations
+load_dotenv()
+load_dotenv("ENV/.env")
 
 # Add engine path
 sys.path.append(os.path.abspath("services/engine-python/src"))
