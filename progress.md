@@ -40,7 +40,11 @@
 
 ### [TASK-008] UI/UX Socratic Agent HUD and Multimodal Vision Notes Scanner
 - **Status**: RESOLVED
-- **Details**: Created the `GemmaAgentHUD.jsx` and `MultimodalScanner.jsx` components in React. Embedded live tool tracking consoles, warning banners, and English/Hindi Socratic feedback panels. Added a drag-and-drop file uploader that converts notes/derivations to Base64 and ships them to Gemma's vision parser. Integrated the Express `/api/telemetry/gemma-diagnose` routing proxy on Node and mapped the new page inside `App.jsx` navigation.
+- **Details**: Created the `GemmaAgentHUD.jsx` component in React. Embedded live tool tracking consoles, warning banners, and English/Hindi Socratic feedback panels. Integrated the Express `/api/telemetry/gemma-diagnose` routing proxy on Node. Removed the separate page route to ensure handwriting upload sits directly inside the Question Solver modal context.
+
+### [TASK-009] BKT Telemetry Gemma Socratic Hook & Coding Sandbox Scroll Resolution
+- **Status**: RESOLVED
+- **Details**: Integrated the `gemma_orchestrator` loop directly into the BKT telemetry pipeline inside `job_consumer.py`, enabling Socratic diagnostics in both English and natural Hindi for every incorrect MCQ or Code submission. Redesigned the Coding Sandbox layout to lock the main container within the viewport (`overflow: hidden`), allowing Monaco Editor to stretch and scroll its content natively (`flex: 1`), and wrapped console logs and agent diagnostic results inside a collapsible tab sheet drawer.
 
 ---
 
