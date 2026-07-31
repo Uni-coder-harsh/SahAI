@@ -19,6 +19,9 @@ let syncInterval: NodeJS.Timeout | null = null;
 let profileStatusBarItem: vscode.StatusBarItem;
 let masteryStatusBarItem: vscode.StatusBarItem;
 
+// VS Code Output Channel for real-time debugging visible to the user/judges
+let logChannel: vscode.OutputChannel;
+
 // In-Memory lookup map for common LeetCode problem numbers to official title slugs
 const COMMON_LEETCODE_MAP: Record<string, string> = {
   "1": "two-sum",
@@ -110,7 +113,10 @@ const COMMON_LEETCODE_MAP: Record<string, string> = {
 };
 
 export function activate(context: vscode.ExtensionContext) {
-  console.log('Congratulations, your extension "vscode-sahai-lens" is now active!');
+  // Initialize VS Code Output Channel
+  logChannel = vscode.window.createOutputChannel("SahAI Lens");
+  logChannel.show(true); // Bring Output Panel to focus immediately
+  logChannel.appendLine("[SahAI Lens] Extension Activated! Output channel initialized.");
 
   // 1. Initialize Profile Status Bar (Left side) - Clicking connects authentication
   profileStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
@@ -127,6 +133,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   // 3. Connect Auth handshakes Command
   const connectCommand = vscode.commands.registerCommand('sahai.connect', async () => {
+    logChannel.appendLine("[Auth] Connect command clicked. Triggering prompt...");
     await promptForToken(context);
   });
   context.subscriptions.push(connectCommand);
@@ -134,6 +141,7 @@ export function activate(context: vscode.ExtensionContext) {
   // 4. Verification warning check
   const checkAuthentication = async () => {
     const apiToken = context.globalState.get<string>('SAHAI_API_TOKEN');
+    logChannel.appendLine(`[Auth] Checking saved token... Presence: ${!!apiToken}`);
     if (!apiToken) {
       const connectChoice = await vscode.window.showWarningMessage(
         'Connect to SahAI to track your DSA mastery.',
@@ -152,12 +160,14 @@ export function activate(context: vscode.ExtensionContext) {
     async () => {
       const apiToken = context.globalState.get<string>('SAHAI_API_TOKEN');
       if (!apiToken) {
+        logChannel.appendLine("[Problem Context] Warning: API Token is missing. Launching connect prompt.");
         await promptForToken(context);
         return;
       }
 
       const activeEditor = vscode.window.activeTextEditor;
       if (!activeEditor) {
+        logChannel.appendLine("[Problem Context] Warning: Active text editor not found.");
         vscode.window.showWarningMessage('Please open a code file first to set its target LeetCode problem context.');
         return;
       }
@@ -165,6 +175,7 @@ export function activate(context: vscode.ExtensionContext) {
       const activePath = activeEditor.document.uri.fsPath;
       const problemMap = context.workspaceState.get<Record<string, string>>('SAHAI_PROBLEM_MAP') || {};
       const currentProblem = problemMap[activePath] || '';
+      logChannel.appendLine(`[Problem Context] Binding problem for file: ${activePath}. Current bind: ${currentProblem}`);
 
       const input = await vscode.window.showInputBox({
         prompt: 'Enter Leetcode Problem (e.g. "1", "LC-1", "two-sum" or "Two Sum")',
@@ -177,19 +188,22 @@ export function activate(context: vscode.ExtensionContext) {
         if (cleaned) {
           let problemSlug = cleaned.toLowerCase().replace(/\s+/g, '-');
 
-          // Check if it matches an integer pattern (like "1" or "lc-1" or "lc 1")
+          // Check if it matches an integer pattern (like "1" or "lc-1")
           const numMatch = problemSlug.match(/^(?:lc[- ]?)?(\d+)$/i);
           if (numMatch) {
             const num = numMatch[1];
             if (COMMON_LEETCODE_MAP[num]) {
               problemSlug = COMMON_LEETCODE_MAP[num];
-              console.log(`[SahAI Lens] Mapping question number ${num} to slug: ${problemSlug}`);
+              logChannel.appendLine(`[Problem Context] Map input number '${num}' to slug: '${problemSlug}'`);
+            } else {
+              logChannel.appendLine(`[Problem Context] Alert: Number '${num}' not in COMMON_LEETCODE_MAP. Treating as slug.`);
             }
           }
 
           // Save the target slug to problem map for this specific file path
           problemMap[activePath] = problemSlug;
           await context.workspaceState.update('SAHAI_PROBLEM_MAP', problemMap);
+          logChannel.appendLine(`[Problem Context] Saved bind mapping: ${activePath} -> ${problemSlug}`);
           
           vscode.window.showInformationMessage(`🧠 SahAI: Mapped this file to [${problemSlug}]`);
 
@@ -199,9 +213,13 @@ export function activate(context: vscode.ExtensionContext) {
             title: `SahAI: Fetching metadata for ${problemSlug}...`,
             cancellable: false
           }, async () => {
+            logChannel.appendLine(`[Problem Context] Querying backend metadata for slug: ${problemSlug}`);
             const contextData = await fetchProblemContextData(apiToken, problemSlug);
             if (contextData && contextData.description) {
+              logChannel.appendLine(`[Problem Context] Description fetched successfully. Inserting comments...`);
               insertQuestionCommentHeader(activeEditor, contextData.title, contextData.description);
+            } else {
+              logChannel.appendLine(`[Problem Context] Warning: Description not found in response.`);
             }
           });
 
@@ -210,6 +228,7 @@ export function activate(context: vscode.ExtensionContext) {
           // Clear mapped slug for this file
           delete problemMap[activePath];
           await context.workspaceState.update('SAHAI_PROBLEM_MAP', problemMap);
+          logChannel.appendLine(`[Problem Context] Cleared bind mapping for file: ${activePath}`);
           vscode.window.showInformationMessage('🧠 SahAI: Target problem cleared for this file.');
           await updateStatusBar(context);
         }
@@ -242,6 +261,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor(() => {
       updateActiveTelemetry();
+      logChannel.appendLine(`[Workspace] Active editor changed: ${activeDocumentPath}`);
       updateStatusBar(context); // Update Status Bars immediately when active tab changes
     })
   );
@@ -283,6 +303,7 @@ export function activate(context: vscode.ExtensionContext) {
       // (b) Empathetic paste nudges
       if (change.text.length > 100) {
         metrics.pasteCharCount += change.text.length;
+        logChannel.appendLine(`[Telemetry] Paste warning triggered on ${path}. Paste length: ${change.text.length}`);
         vscode.window.showInformationMessage(
           'Copy-pasting? Breaking down the logic yourself builds stronger long-term memory! 🌱'
         );
@@ -319,6 +340,9 @@ export function activate(context: vscode.ExtensionContext) {
             behavioral_flags: metrics.pasteCharCount > 100 ? ['COPY_PASTE_WARNING'] : []
           };
 
+          logChannel.appendLine(`[Telemetry Sync] Querying sync to: ${backendUrl}/api/telemetry/vscode`);
+          logChannel.appendLine(`[Telemetry Sync] Payload: ${JSON.stringify(payload)}`);
+
           await axios.post(`${backendUrl}/api/telemetry/vscode`, payload, {
             headers: {
               'Authorization': `Bearer ${apiToken}`,
@@ -326,14 +350,19 @@ export function activate(context: vscode.ExtensionContext) {
             }
           });
 
+          logChannel.appendLine(`[Telemetry Sync] Sync successful for ${path}!`);
           didSync = true;
+
           // Reset metrics on successful transmission
           metrics.timeSpentSeconds = 0;
           metrics.backspaceCount = 0;
           metrics.pasteCharCount = 0;
           metrics.runCount = 0;
         } catch (err: any) {
-          console.error('[SahAI Lens] Telemetry sync error: ', err.message);
+          logChannel.appendLine(`[Telemetry Sync] ERROR: ${err.message} (URL: ${backendUrl})`);
+          if (err.response) {
+            logChannel.appendLine(`[Telemetry Sync] Response Data: ${JSON.stringify(err.response.data)}`);
+          }
         }
       }
     }
@@ -374,13 +403,17 @@ export function activate(context: vscode.ExtensionContext) {
       cancellable: false
     }, async () => {
       try {
-        const response = await axios.post(`${ollamaUrl}/api/generate`, {
+        logChannel.appendLine(`[Socratic Local RAG] Document saved. Querying local Ollama model... URL: ${ollamaUrl}/api/generate`);
+        const payload = {
           model: 'codegemma:2b',
           prompt: `You are an empathetic DSA tutor. The student is solving problem ${problemId}. Here is their code:\n\n${codeContent}\n\nIdentify ONE logical flaw or optimization. DO NOT write code. Provide a 1-sentence Socratic question to make them think.`,
           stream: false
-        }, { timeout: 15000 });
+        };
+
+        const response = await axios.post(`${ollamaUrl}/api/generate`, payload, { timeout: 15000 });
 
         const socraticHint = response.data?.response?.trim() || 'What is the base case check value in your algorithm?';
+        logChannel.appendLine(`[Socratic Local RAG] Response: ${socraticHint}`);
 
         let targetLine = 0;
         for (let i = 0; i < doc.lineCount; i++) {
@@ -400,7 +433,7 @@ export function activate(context: vscode.ExtensionContext) {
 
         diagnosticCollection.set(doc.uri, [diagnostic]);
       } catch (err: any) {
-        console.warn('[SahAI Lens] Ollama local service not reachable: ', err.message);
+        logChannel.appendLine(`[Socratic Local RAG] ERROR: Local Ollama service is not reachable: ${err.message} (Url: ${ollamaUrl})`);
         diagnosticCollection.set(doc.uri, []);
       }
     });
@@ -415,14 +448,17 @@ async function fetchProblemContextData(apiToken: string, problemSlug: string): P
   const config = vscode.workspace.getConfiguration('sahaiLens');
   const backendUrl = config.get<string>('backendUrl') || 'https://sahai-api-node-production-f2f3.up.railway.app';
   try {
-    const response = await axios.get(`${backendUrl}/api/telemetry/vscode-context/${problemSlug}`, {
+    const queryUrl = `${backendUrl}/api/telemetry/vscode-context/${problemSlug}`;
+    logChannel.appendLine(`[API] Fetching LeetCode mapping details from: ${queryUrl}`);
+    const response = await axios.get(queryUrl, {
       headers: {
         'Authorization': `Bearer ${apiToken}`
       }
     });
+    logChannel.appendLine(`[API] Response: ${JSON.stringify(response.data)}`);
     return response.data;
-  } catch (err) {
-    console.error('[SahAI Lens] Failed to fetch problem details: ', err);
+  } catch (err: any) {
+    logChannel.appendLine(`[API] ERROR fetching LeetCode metadata: ${err.message}`);
     return null;
   }
 }
@@ -475,9 +511,11 @@ async function promptForToken(context: vscode.ExtensionContext) {
   if (token) {
     const cleaned = token.trim();
     await context.globalState.update('SAHAI_API_TOKEN', cleaned);
+    logChannel.appendLine(`[Auth] User updated API token: ${cleaned.substring(0, 8)}...`);
     vscode.window.showInformationMessage('🔑 SahAI Lens: Successfully connected!');
     await updateStatusBar(context);
   } else {
+    logChannel.appendLine("[Auth] Token prompt input cancelled.");
     vscode.window.showErrorMessage('🔑 SahAI Lens: API Token input cancelled.');
   }
 }
@@ -487,6 +525,8 @@ async function updateStatusBar(context: vscode.ExtensionContext) {
   const apiToken = context.globalState.get<string>('SAHAI_API_TOKEN');
   const config = vscode.workspace.getConfiguration('sahaiLens');
   const backendUrl = config.get<string>('backendUrl') || 'https://sahai-api-node-production-f2f3.up.railway.app';
+
+  logChannel.appendLine(`[Status Bar] Refreshing. Token Present: ${!!apiToken}`);
 
   // State 1: Disconnected
   if (!apiToken) {
@@ -500,16 +540,20 @@ async function updateStatusBar(context: vscode.ExtensionContext) {
 
   // State 2: Fetch and display User profile details (Left side)
   try {
-    const profileRes = await axios.get(`${backendUrl}/api/users/${apiToken}`, {
+    const profileUrl = `${backendUrl}/api/users/${apiToken}`;
+    logChannel.appendLine(`[Status Bar] Fetching profile username from: ${profileUrl}`);
+    const profileRes = await axios.get(profileUrl, {
       headers: {
         'Authorization': `Bearer ${apiToken}`
       }
     });
     const userName = profileRes.data?.name || profileRes.data?.username || 'Student';
+    logChannel.appendLine(`[Status Bar] Logged in user: ${userName}`);
     profileStatusBarItem.text = `$(account) SahAI: ${userName}`;
     profileStatusBarItem.tooltip = `Logged in as ${userName} (${profileRes.data?.academic_stream || 'DSA Program'})`;
     profileStatusBarItem.show();
-  } catch (err) {
+  } catch (err: any) {
+    logChannel.appendLine(`[Status Bar] ERROR fetching profile name: ${err.message}`);
     profileStatusBarItem.text = '$(account) SahAI: Authenticated';
     profileStatusBarItem.tooltip = 'Click to reconnect credentials';
     profileStatusBarItem.show();
@@ -521,10 +565,13 @@ async function updateStatusBar(context: vscode.ExtensionContext) {
     const activePath = activeEditor.document.uri.fsPath;
     const problemMap = context.workspaceState.get<Record<string, string>>('SAHAI_PROBLEM_MAP') || {};
     const problemSlug = problemMap[activePath];
+    logChannel.appendLine(`[Status Bar] Active editor: ${activePath}, problemSlug: ${problemSlug}`);
 
     if (problemSlug) {
       try {
-        const contextRes = await axios.get(`${backendUrl}/api/telemetry/vscode-context/${problemSlug}`, {
+        const queryUrl = `${backendUrl}/api/telemetry/vscode-context/${problemSlug}`;
+        logChannel.appendLine(`[Status Bar] Fetching context mastery from: ${queryUrl}`);
+        const contextRes = await axios.get(queryUrl, {
           headers: {
             'Authorization': `Bearer ${apiToken}`
           }
@@ -532,11 +579,13 @@ async function updateStatusBar(context: vscode.ExtensionContext) {
         const title = contextRes.data?.title || problemSlug;
         const masteryValue = contextRes.data?.average_mastery !== undefined ? contextRes.data.average_mastery : 0.5;
         const displayPercentage = Math.round(masteryValue * 100);
+        logChannel.appendLine(`[Status Bar] Context fetched: ${title}, Mastery expected: ${displayPercentage}%`);
 
         masteryStatusBarItem.text = `$(brain) [${title}] Mastery: ${displayPercentage}%`;
         masteryStatusBarItem.tooltip = `Concept mapping tracks: ${contextRes.data?.mapped_nodes?.join(', ') || 'General'}`;
         masteryStatusBarItem.show();
-      } catch (err) {
+      } catch (err: any) {
+        logChannel.appendLine(`[Status Bar] ERROR fetching context details: ${err.message}`);
         masteryStatusBarItem.text = `$(brain) [${problemSlug}] Active`;
         masteryStatusBarItem.tooltip = 'Unable to sync mastery values from remote gateway.';
         masteryStatusBarItem.show();
@@ -547,6 +596,7 @@ async function updateStatusBar(context: vscode.ExtensionContext) {
       masteryStatusBarItem.show();
     }
   } else {
+    logChannel.appendLine("[Status Bar] No active text editor open. Hiding mastery status bar.");
     masteryStatusBarItem.hide();
   }
 }

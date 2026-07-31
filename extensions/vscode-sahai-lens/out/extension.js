@@ -33,19 +33,125 @@ const telemetryStore = {};
 let activeDocumentPath = null;
 let activeInterval = null;
 let syncInterval = null;
-// Status bar item to display problem context
-let statusBarItem;
+// Dual Status Bar Items for authenticated profile (Left) and Mastery context (Right)
+let profileStatusBarItem;
+let masteryStatusBarItem;
+// VS Code Output Channel for real-time debugging visible to the user/judges
+let logChannel;
+// In-Memory lookup map for common LeetCode problem numbers to official title slugs
+const COMMON_LEETCODE_MAP = {
+    "1": "two-sum",
+    "2": "add-two-numbers",
+    "3": "longest-substring-without-repeating-characters",
+    "4": "median-of-two-sorted-arrays",
+    "5": "longest-palindromic-substring",
+    "9": "palindrome-number",
+    "11": "container-with-most-water",
+    "13": "roman-to-integer",
+    "14": "longest-common-prefix",
+    "15": "3sum",
+    "19": "remove-nth-node-from-end-of-list",
+    "20": "valid-parentheses",
+    "21": "merge-two-sorted-lists",
+    "22": "generate-parentheses",
+    "23": "merge-k-sorted-lists",
+    "26": "remove-duplicates-from-sorted-array",
+    "27": "remove-element",
+    "33": "search-in-rotated-sorted-array",
+    "34": "find-first-and-last-position-of-element-in-sorted-array",
+    "35": "search-insert-position",
+    "39": "combination-sum",
+    "42": "trapping-rain-water",
+    "46": "permutations",
+    "48": "rotate-image",
+    "49": "group-anagrams",
+    "50": "powx-n",
+    "53": "maximum-subarray",
+    "55": "jump-game",
+    "56": "merge-intervals",
+    "70": "climbing-stairs",
+    "72": "edit-distance",
+    "74": "search-a-2d-matrix",
+    "75": "sort-colors",
+    "78": "subsets",
+    "79": "word-search",
+    "84": "largest-rectangle-in-histogram",
+    "88": "merge-sorted-array",
+    "94": "binary-tree-inorder-traversal",
+    "98": "validate-binary-search-tree",
+    "101": "symmetric-tree",
+    "102": "binary-tree-level-order-traversal",
+    "104": "maximum-depth-of-binary-tree",
+    "121": "best-time-to-buy-and-sell-stock",
+    "122": "best-time-to-buy-and-sell-stock-ii",
+    "124": "binary-tree-maximum-path-sum",
+    "125": "valid-palindrome",
+    "128": "longest-consecutive-sequence",
+    "136": "single-number",
+    "138": "copy-list-with-random-pointer",
+    "139": "word-break",
+    "141": "linked-list-cycle",
+    "142": "linked-list-cycle-ii",
+    "146": "lru-cache",
+    "155": "min-stack",
+    "160": "intersection-of-two-linked-lists",
+    "167": "two-sum-ii-input-array-is-sorted",
+    "169": "majority-element",
+    "189": "rotate-array",
+    "198": "house-robber",
+    "200": "number-of-islands",
+    "206": "reverse-linked-list",
+    "207": "course-schedule",
+    "208": "implement-trie-prefix-tree",
+    "215": "kth-largest-element-in-an-array",
+    "217": "contains-duplicate",
+    "226": "invert-binary-tree",
+    "230": "kth-smallest-element-in-a-bst",
+    "234": "palindrome-linked-list",
+    "236": "lowest-common-ancestor-of-a-binary-tree",
+    "238": "product-of-array-except-self",
+    "239": "sliding-window-maximum",
+    "242": "valid-anagram",
+    "283": "move-zeroes",
+    "295": "find-median-from-data-stream",
+    "300": "longest-increasing-subsequence",
+    "322": "coin-change",
+    "344": "reverse-string",
+    "347": "top-k-frequent-elements",
+    "387": "first-unique-character-in-a-string",
+    "412": "fizz-buzz",
+    "438": "find-all-anagrams-in-a-string",
+    "543": "diameter-of-binary-tree",
+    "560": "subarray-sum-equals-k",
+    "704": "binary-search",
+    "739": "daily-temperatures",
+    "977": "squares-of-a-sorted-array"
+};
 function activate(context) {
-    console.log('Congratulations, your extension "vscode-sahai-lens" is now active!');
-    // Create status bar item for DSA tracking status
-    statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-    statusBarItem.command = 'sahai.setProblemContext';
-    context.subscriptions.push(statusBarItem);
-    // Initialize and check status bar
+    // Initialize VS Code Output Channel
+    logChannel = vscode.window.createOutputChannel("SahAI Lens");
+    logChannel.show(true); // Bring Output Panel to focus immediately
+    logChannel.appendLine("[SahAI Lens] Extension Activated! Output channel initialized.");
+    // 1. Initialize Profile Status Bar (Left side) - Clicking connects authentication
+    profileStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+    profileStatusBarItem.command = 'sahai.connect';
+    context.subscriptions.push(profileStatusBarItem);
+    // 2. Initialize Mastery Context Status Bar (Right side) - Clicking changes file problem target
+    masteryStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+    masteryStatusBarItem.command = 'sahai.setProblemContext';
+    context.subscriptions.push(masteryStatusBarItem);
+    // Initial UI refresh
     updateStatusBar(context);
-    // 1. Auth Handshake Verification
+    // 3. Connect Auth handshakes Command
+    const connectCommand = vscode.commands.registerCommand('sahai.connect', async () => {
+        logChannel.appendLine("[Auth] Connect command clicked. Triggering prompt...");
+        await promptForToken(context);
+    });
+    context.subscriptions.push(connectCommand);
+    // 4. Verification warning check
     const checkAuthentication = async () => {
         const apiToken = context.globalState.get('SAHAI_API_TOKEN');
+        logChannel.appendLine(`[Auth] Checking saved token... Presence: ${!!apiToken}`);
         if (!apiToken) {
             const connectChoice = await vscode.window.showWarningMessage('Connect to SahAI to track your DSA mastery.', 'Connect SahAI');
             if (connectChoice === 'Connect SahAI') {
@@ -54,23 +160,80 @@ function activate(context) {
         }
     };
     checkAuthentication();
-    // 2. Command Contribution: Target Problem Context Binding
+    // 5. Command Contribution: Target Problem Context Binding (Per-File Basis)
     const setProblemContextCommand = vscode.commands.registerCommand('sahai.setProblemContext', async () => {
-        const currentProblem = context.workspaceState.get('SAHAI_PROBLEM_ID') || '';
+        const apiToken = context.globalState.get('SAHAI_API_TOKEN');
+        if (!apiToken) {
+            logChannel.appendLine("[Problem Context] Warning: API Token is missing. Launching connect prompt.");
+            await promptForToken(context);
+            return;
+        }
+        const activeEditor = vscode.window.activeTextEditor;
+        if (!activeEditor) {
+            logChannel.appendLine("[Problem Context] Warning: Active text editor not found.");
+            vscode.window.showWarningMessage('Please open a code file first to set its target LeetCode problem context.');
+            return;
+        }
+        const activePath = activeEditor.document.uri.fsPath;
+        const problemMap = context.workspaceState.get('SAHAI_PROBLEM_MAP') || {};
+        const currentProblem = problemMap[activePath] || '';
+        logChannel.appendLine(`[Problem Context] Binding problem for file: ${activePath}. Current bind: ${currentProblem}`);
         const input = await vscode.window.showInputBox({
-            prompt: 'Enter Problem ID (e.g., LC-1 for Two Sum, or SAH-45)',
+            prompt: 'Enter Leetcode Problem (e.g. "1", "LC-1", "two-sum" or "Two Sum")',
             value: currentProblem,
-            placeHolder: 'e.g., LC-1'
+            placeHolder: 'e.g., LC-1 or two-sum'
         });
         if (input !== undefined) {
             const cleaned = input.trim();
-            await context.workspaceState.update('SAHAI_PROBLEM_ID', cleaned);
-            vscode.window.showInformationMessage(cleaned ? `🧠 SahAI: Target problem set to [${cleaned}]` : '🧠 SahAI: Target problem cleared');
-            updateStatusBar(context);
+            if (cleaned) {
+                let problemSlug = cleaned.toLowerCase().replace(/\s+/g, '-');
+                // Check if it matches an integer pattern (like "1" or "lc-1")
+                const numMatch = problemSlug.match(/^(?:lc[- ]?)?(\d+)$/i);
+                if (numMatch) {
+                    const num = numMatch[1];
+                    if (COMMON_LEETCODE_MAP[num]) {
+                        problemSlug = COMMON_LEETCODE_MAP[num];
+                        logChannel.appendLine(`[Problem Context] Map input number '${num}' to slug: '${problemSlug}'`);
+                    }
+                    else {
+                        logChannel.appendLine(`[Problem Context] Alert: Number '${num}' not in COMMON_LEETCODE_MAP. Treating as slug.`);
+                    }
+                }
+                // Save the target slug to problem map for this specific file path
+                problemMap[activePath] = problemSlug;
+                await context.workspaceState.update('SAHAI_PROBLEM_MAP', problemMap);
+                logChannel.appendLine(`[Problem Context] Saved bind mapping: ${activePath} -> ${problemSlug}`);
+                vscode.window.showInformationMessage(`🧠 SahAI: Mapped this file to [${problemSlug}]`);
+                // Fetch context immediately & insert question comment
+                await vscode.window.withProgress({
+                    location: vscode.ProgressLocation.Notification,
+                    title: `SahAI: Fetching metadata for ${problemSlug}...`,
+                    cancellable: false
+                }, async () => {
+                    logChannel.appendLine(`[Problem Context] Querying backend metadata for slug: ${problemSlug}`);
+                    const contextData = await fetchProblemContextData(apiToken, problemSlug);
+                    if (contextData && contextData.description) {
+                        logChannel.appendLine(`[Problem Context] Description fetched successfully. Inserting comments...`);
+                        insertQuestionCommentHeader(activeEditor, contextData.title, contextData.description);
+                    }
+                    else {
+                        logChannel.appendLine(`[Problem Context] Warning: Description not found in response.`);
+                    }
+                });
+                await updateStatusBar(context);
+            }
+            else {
+                // Clear mapped slug for this file
+                delete problemMap[activePath];
+                await context.workspaceState.update('SAHAI_PROBLEM_MAP', problemMap);
+                logChannel.appendLine(`[Problem Context] Cleared bind mapping for file: ${activePath}`);
+                vscode.window.showInformationMessage('🧠 SahAI: Target problem cleared for this file.');
+                await updateStatusBar(context);
+            }
         }
     });
     context.subscriptions.push(setProblemContextCommand);
-    // 3. Track Active Workspace Editor Document State & Active Timing
+    // 6. Track Active Workspace Editor Document State & Active Timing
     const updateActiveTelemetry = () => {
         const editor = vscode.window.activeTextEditor;
         if (editor && isSupportedLanguage(editor.document.languageId)) {
@@ -93,15 +256,17 @@ function activate(context) {
     };
     context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(() => {
         updateActiveTelemetry();
+        logChannel.appendLine(`[Workspace] Active editor changed: ${activeDocumentPath}`);
+        updateStatusBar(context); // Update Status Bars immediately when active tab changes
     }));
     updateActiveTelemetry();
-    // 4. In-Memory Time Tracker (Tick active seconds)
+    // 7. In-Memory Time Tracker (Tick active seconds)
     activeInterval = setInterval(() => {
         if (activeDocumentPath && telemetryStore[activeDocumentPath]) {
             telemetryStore[activeDocumentPath].timeSpentSeconds += 1;
         }
     }, 1000);
-    // 5. Empathetic Telemetry Text Change Event Listeners
+    // 8. Empathetic Telemetry Text Change Event Listeners
     const textChangeListener = vscode.workspace.onDidChangeTextDocument((event) => {
         const doc = event.document;
         if (!isSupportedLanguage(doc.languageId)) {
@@ -119,19 +284,20 @@ function activate(context) {
         }
         const metrics = telemetryStore[path];
         event.contentChanges.forEach((change) => {
-            // (a) Backspace Detection (empty input text replacing character ranges)
+            // (a) Deletions / Backspaces
             if (change.text === '' && change.rangeLength > 0) {
                 metrics.backspaceCount += 1;
             }
-            // (b) Copy-Paste Detection (inserts exceeding 100 characters)
+            // (b) Empathetic paste nudges
             if (change.text.length > 100) {
                 metrics.pasteCharCount += change.text.length;
+                logChannel.appendLine(`[Telemetry] Paste warning triggered on ${path}. Paste length: ${change.text.length}`);
                 vscode.window.showInformationMessage('Copy-pasting? Breaking down the logic yourself builds stronger long-term memory! 🌱');
             }
         });
     });
     context.subscriptions.push(textChangeListener);
-    // 6. Background Telemetry Ingest Sync Interval (Every 60 seconds)
+    // 9. Background Telemetry Ingest Sync Interval (Every 60 seconds)
     syncInterval = setInterval(async () => {
         const apiToken = context.globalState.get('SAHAI_API_TOKEN');
         if (!apiToken) {
@@ -139,9 +305,11 @@ function activate(context) {
         }
         const config = vscode.workspace.getConfiguration('sahaiLens');
         const backendUrl = config.get('backendUrl') || 'https://sahai-api-node-production-f2f3.up.railway.app';
+        const problemMap = context.workspaceState.get('SAHAI_PROBLEM_MAP') || {};
+        let didSync = false;
         for (const path of Object.keys(telemetryStore)) {
             const metrics = telemetryStore[path];
-            const problemId = context.workspaceState.get('SAHAI_PROBLEM_ID') || 'GENERAL';
+            const problemId = problemMap[path] || 'general-dsa';
             // Send telemetry if they have actively spent time coding
             if (metrics.timeSpentSeconds > 0 || metrics.pasteCharCount > 0 || metrics.backspaceCount > 0) {
                 try {
@@ -153,39 +321,48 @@ function activate(context) {
                         paste_char_count: metrics.pasteCharCount,
                         behavioral_flags: metrics.pasteCharCount > 100 ? ['COPY_PASTE_WARNING'] : []
                     };
+                    logChannel.appendLine(`[Telemetry Sync] Querying sync to: ${backendUrl}/api/telemetry/vscode`);
+                    logChannel.appendLine(`[Telemetry Sync] Payload: ${JSON.stringify(payload)}`);
                     await axios_1.default.post(`${backendUrl}/api/telemetry/vscode`, payload, {
                         headers: {
                             'Authorization': `Bearer ${apiToken}`,
                             'Content-Type': 'application/json'
                         }
                     });
-                    // Reset accumulators on successful transmission
+                    logChannel.appendLine(`[Telemetry Sync] Sync successful for ${path}!`);
+                    didSync = true;
+                    // Reset metrics on successful transmission
                     metrics.timeSpentSeconds = 0;
                     metrics.backspaceCount = 0;
                     metrics.pasteCharCount = 0;
                     metrics.runCount = 0;
                 }
                 catch (err) {
-                    console.error('[SahAI Lens] Telemetry sync error: ', err.message);
+                    logChannel.appendLine(`[Telemetry Sync] ERROR: ${err.message} (URL: ${backendUrl})`);
+                    if (err.response) {
+                        logChannel.appendLine(`[Telemetry Sync] Response Data: ${JSON.stringify(err.response.data)}`);
+                    }
                 }
             }
         }
+        if (didSync) {
+            await updateStatusBar(context);
+        }
     }, 60000);
-    // 7. Socratic Diagnostics Hover Collections (Anti-Copilot Inline Queries)
+    // 10. Socratic Diagnostics Hover Collections
     const diagnosticCollection = vscode.languages.createDiagnosticCollection('sahai-socratic');
     context.subscriptions.push(diagnosticCollection);
     const saveListener = vscode.workspace.onDidSaveTextDocument(async (doc) => {
         if (!isSupportedLanguage(doc.languageId)) {
             return;
         }
-        // Accumulate saves as run/submissions counts
         const path = doc.uri.fsPath;
         if (telemetryStore[path]) {
             telemetryStore[path].runCount += 1;
         }
-        const problemId = context.workspaceState.get('SAHAI_PROBLEM_ID');
+        const problemMap = context.workspaceState.get('SAHAI_PROBLEM_MAP') || {};
+        const problemId = problemMap[path];
         if (!problemId) {
-            // Clear old diagnostics if no context is set
             diagnosticCollection.set(doc.uri, []);
             return;
         }
@@ -198,13 +375,15 @@ function activate(context) {
             cancellable: false
         }, async () => {
             try {
-                const response = await axios_1.default.post(`${ollamaUrl}/api/generate`, {
+                logChannel.appendLine(`[Socratic Local RAG] Document saved. Querying local Ollama model... URL: ${ollamaUrl}/api/generate`);
+                const payload = {
                     model: 'codegemma:2b',
                     prompt: `You are an empathetic DSA tutor. The student is solving problem ${problemId}. Here is their code:\n\n${codeContent}\n\nIdentify ONE logical flaw or optimization. DO NOT write code. Provide a 1-sentence Socratic question to make them think.`,
                     stream: false
-                }, { timeout: 15000 });
+                };
+                const response = await axios_1.default.post(`${ollamaUrl}/api/generate`, payload, { timeout: 15000 });
                 const socraticHint = response.data?.response?.trim() || 'What is the base case check value in your algorithm?';
-                // Set diagnostics squiggly line on the first non-empty line of code
+                logChannel.appendLine(`[Socratic Local RAG] Response: ${socraticHint}`);
                 let targetLine = 0;
                 for (let i = 0; i < doc.lineCount; i++) {
                     if (doc.lineAt(i).text.trim().length > 0) {
@@ -218,16 +397,68 @@ function activate(context) {
                 diagnosticCollection.set(doc.uri, [diagnostic]);
             }
             catch (err) {
-                console.warn('[SahAI Lens] Ollama local service not reachable: ', err.message);
-                // Clear collection if offline or fails to prevent outdated warnings
+                logChannel.appendLine(`[Socratic Local RAG] ERROR: Local Ollama service is not reachable: ${err.message} (Url: ${ollamaUrl})`);
                 diagnosticCollection.set(doc.uri, []);
             }
         });
+        await updateStatusBar(context);
     });
     context.subscriptions.push(saveListener);
 }
 exports.activate = activate;
-// 8. Auth Token Input Dialog Prompt
+// 11. Fetch Context data helper
+async function fetchProblemContextData(apiToken, problemSlug) {
+    const config = vscode.workspace.getConfiguration('sahaiLens');
+    const backendUrl = config.get('backendUrl') || 'https://sahai-api-node-production-f2f3.up.railway.app';
+    try {
+        const queryUrl = `${backendUrl}/api/telemetry/vscode-context/${problemSlug}`;
+        logChannel.appendLine(`[API] Fetching LeetCode mapping details from: ${queryUrl}`);
+        const response = await axios_1.default.get(queryUrl, {
+            headers: {
+                'Authorization': `Bearer ${apiToken}`
+            }
+        });
+        logChannel.appendLine(`[API] Response: ${JSON.stringify(response.data)}`);
+        return response.data;
+    }
+    catch (err) {
+        logChannel.appendLine(`[API] ERROR fetching LeetCode metadata: ${err.message}`);
+        return null;
+    }
+}
+// 12. Format and insert question markdown description as comments at top of file
+function insertQuestionCommentHeader(editor, title, description) {
+    const doc = editor.document;
+    const langId = doc.languageId;
+    let commentPrefix = '#';
+    if (['javascript', 'typescript', 'cpp', 'java', 'go', 'rust'].includes(langId.toLowerCase())) {
+        commentPrefix = '//';
+    }
+    // Clear tags and decode common XML entities
+    let cleanDesc = description
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .replace(/&quot;/g, '"')
+        .trim();
+    // Split and format lines
+    const lines = cleanDesc.split('\n');
+    const formattedLines = lines.map(line => {
+        const trimmed = line.trim();
+        return trimmed.length > 0 ? `${commentPrefix} ${trimmed}` : commentPrefix;
+    });
+    const header = `${commentPrefix} ==========================================\n` +
+        `${commentPrefix} LeetCode Problem: ${title}\n` +
+        `${commentPrefix} ==========================================\n` +
+        formattedLines.join('\n') + '\n' +
+        `${commentPrefix} ==========================================\n\n`;
+    editor.edit(editBuilder => {
+        editBuilder.insert(new vscode.Position(0, 0), header);
+    });
+}
+// 13. Auth Token Input Dialog Prompt
 async function promptForToken(context) {
     const token = await vscode.window.showInputBox({
         prompt: 'Paste your Web API Token from the SahAI Dashboard to authenticate',
@@ -237,35 +468,94 @@ async function promptForToken(context) {
     if (token) {
         const cleaned = token.trim();
         await context.globalState.update('SAHAI_API_TOKEN', cleaned);
+        logChannel.appendLine(`[Auth] User updated API token: ${cleaned.substring(0, 8)}...`);
         vscode.window.showInformationMessage('🔑 SahAI Lens: Successfully connected!');
-        updateStatusBar(context);
+        await updateStatusBar(context);
     }
     else {
+        logChannel.appendLine("[Auth] Token prompt input cancelled.");
         vscode.window.showErrorMessage('🔑 SahAI Lens: API Token input cancelled.');
     }
 }
-// Helper to determine status bar content state
-function updateStatusBar(context) {
-    const problemId = context.workspaceState.get('SAHAI_PROBLEM_ID');
+// 14. Async Status Bar Refresher (Updates per-file context and user details)
+async function updateStatusBar(context) {
     const apiToken = context.globalState.get('SAHAI_API_TOKEN');
+    const config = vscode.workspace.getConfiguration('sahaiLens');
+    const backendUrl = config.get('backendUrl') || 'https://sahai-api-node-production-f2f3.up.railway.app';
+    logChannel.appendLine(`[Status Bar] Refreshing. Token Present: ${!!apiToken}`);
+    // State 1: Disconnected
     if (!apiToken) {
-        statusBarItem.text = '$(key) SahAI: Connect Needed';
-        statusBarItem.tooltip = 'Click to connect your SahAI Web API credentials';
-        statusBarItem.show();
+        profileStatusBarItem.text = '$(key) SahAI: Connect Needed';
+        profileStatusBarItem.tooltip = 'Click to connect your SahAI Web API credentials';
+        profileStatusBarItem.show();
+        masteryStatusBarItem.hide();
         return;
     }
-    if (problemId) {
-        statusBarItem.text = `🧠 SahAI: [${problemId}] Active`;
-        statusBarItem.tooltip = `Currently tracking mastery telemetry on problem ${problemId}. Click to switch context.`;
+    // State 2: Fetch and display User profile details (Left side)
+    try {
+        const profileUrl = `${backendUrl}/api/users/${apiToken}`;
+        logChannel.appendLine(`[Status Bar] Fetching profile username from: ${profileUrl}`);
+        const profileRes = await axios_1.default.get(profileUrl, {
+            headers: {
+                'Authorization': `Bearer ${apiToken}`
+            }
+        });
+        const userName = profileRes.data?.name || profileRes.data?.username || 'Student';
+        logChannel.appendLine(`[Status Bar] Logged in user: ${userName}`);
+        profileStatusBarItem.text = `$(account) SahAI: ${userName}`;
+        profileStatusBarItem.tooltip = `Logged in as ${userName} (${profileRes.data?.academic_stream || 'DSA Program'})`;
+        profileStatusBarItem.show();
+    }
+    catch (err) {
+        logChannel.appendLine(`[Status Bar] ERROR fetching profile name: ${err.message}`);
+        profileStatusBarItem.text = '$(account) SahAI: Authenticated';
+        profileStatusBarItem.tooltip = 'Click to reconnect credentials';
+        profileStatusBarItem.show();
+    }
+    // State 3: Fetch and display active file problem expected mastery (Right side)
+    const activeEditor = vscode.window.activeTextEditor;
+    if (activeEditor) {
+        const activePath = activeEditor.document.uri.fsPath;
+        const problemMap = context.workspaceState.get('SAHAI_PROBLEM_MAP') || {};
+        const problemSlug = problemMap[activePath];
+        logChannel.appendLine(`[Status Bar] Active editor: ${activePath}, problemSlug: ${problemSlug}`);
+        if (problemSlug) {
+            try {
+                const queryUrl = `${backendUrl}/api/telemetry/vscode-context/${problemSlug}`;
+                logChannel.appendLine(`[Status Bar] Fetching context mastery from: ${queryUrl}`);
+                const contextRes = await axios_1.default.get(queryUrl, {
+                    headers: {
+                        'Authorization': `Bearer ${apiToken}`
+                    }
+                });
+                const title = contextRes.data?.title || problemSlug;
+                const masteryValue = contextRes.data?.average_mastery !== undefined ? contextRes.data.average_mastery : 0.5;
+                const displayPercentage = Math.round(masteryValue * 100);
+                logChannel.appendLine(`[Status Bar] Context fetched: ${title}, Mastery expected: ${displayPercentage}%`);
+                masteryStatusBarItem.text = `$(brain) [${title}] Mastery: ${displayPercentage}%`;
+                masteryStatusBarItem.tooltip = `Concept mapping tracks: ${contextRes.data?.mapped_nodes?.join(', ') || 'General'}`;
+                masteryStatusBarItem.show();
+            }
+            catch (err) {
+                logChannel.appendLine(`[Status Bar] ERROR fetching context details: ${err.message}`);
+                masteryStatusBarItem.text = `$(brain) [${problemSlug}] Active`;
+                masteryStatusBarItem.tooltip = 'Unable to sync mastery values from remote gateway.';
+                masteryStatusBarItem.show();
+            }
+        }
+        else {
+            masteryStatusBarItem.text = '$(brain) SahAI: Select Problem';
+            masteryStatusBarItem.tooltip = 'Click to target a LeetCode problem slug for this file';
+            masteryStatusBarItem.show();
+        }
     }
     else {
-        statusBarItem.text = '🧠 SahAI: Select Problem';
-        statusBarItem.tooltip = 'Click to map your coding session to a target DSA concept problem';
+        logChannel.appendLine("[Status Bar] No active text editor open. Hiding mastery status bar.");
+        masteryStatusBarItem.hide();
     }
-    statusBarItem.show();
 }
 function isSupportedLanguage(langId) {
-    const supported = ['python', 'cpp', 'java', 'javascript', 'typescript'];
+    const supported = ['python', 'cpp', 'java', 'javascript', 'typescript', 'go', 'rust'];
     return supported.includes(langId.toLowerCase());
 }
 function deactivate() {
