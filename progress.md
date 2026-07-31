@@ -54,6 +54,10 @@
 - **Status**: RESOLVED
 - **Details**: Scaffolded and compiled a VS Code extension inside `extensions/vscode-sahai-lens`. Implemented: (a) secure authentication handshakes leveraging workspace configurations and status bar widgets; (b) active telemetry triggers recording edit duration, backspaces, and paste character counts; (c) background 60s asynchronous telemetry sync to the Node gateway `/api/telemetry/vscode` endpoint; and (d) Socratic hover diagnostics collections triggered on file saves, querying local Ollama (`codegemma:2b`) for inline feedback. Exposed the `/vscode` route on the Node API Gateway.
 
+### [TASK-012] Dynamic Gemma 4 Concept Mapping and VS Code Status Bar Upgrade
+- **Status**: RESOLVED
+- **Details**: Upgraded the VS Code extension to feature visible authentication status (`Left` status bar item: `$(account) SahAI: {UserName}`) and real-time average concept mastery (`Right` status bar item: `$(brain) [{ProblemTitle}] Mastery: {expected}%`). Developed backend endpoint `GET /vscode-context/:problemSlug` inside the Node API Gateway and mapped it to a new `/gemma-map-problem` service in the Python engine. The Python orchestrator utilizes Gemma 4 to parse LeetCode metadata and map problems to internal concept nodes, which are then cached in MongoDB.
+
 ---
 
 ## Error & Bug Ledger

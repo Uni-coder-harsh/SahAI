@@ -15,21 +15,27 @@ let activeDocumentPath: string | null = null;
 let activeInterval: NodeJS.Timeout | null = null;
 let syncInterval: NodeJS.Timeout | null = null;
 
-// Status bar item to display problem context
-let statusBarItem: vscode.StatusBarItem;
+// Dual Status Bar Items for authenticated profile (Left) and Mastery context (Right)
+let profileStatusBarItem: vscode.StatusBarItem;
+let masteryStatusBarItem: vscode.StatusBarItem;
 
 export function activate(context: vscode.ExtensionContext) {
   console.log('Congratulations, your extension "vscode-sahai-lens" is now active!');
 
-  // Create status bar item for DSA tracking status
-  statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-  statusBarItem.command = 'sahai.setProblemContext';
-  context.subscriptions.push(statusBarItem);
+  // 1. Initialize Profile Status Bar (Left side)
+  profileStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+  profileStatusBarItem.command = 'sahai.setProblemContext';
+  context.subscriptions.push(profileStatusBarItem);
 
-  // Initialize and check status bar
+  // 2. Initialize Mastery Context Status Bar (Right side)
+  masteryStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+  masteryStatusBarItem.command = 'sahai.setProblemContext';
+  context.subscriptions.push(masteryStatusBarItem);
+
+  // Initial Sync UI update
   updateStatusBar(context);
 
-  // 1. Auth Handshake Verification
+  // 3. Auth Handshake Verification
   const checkAuthentication = async () => {
     const apiToken = context.globalState.get<string>('SAHAI_API_TOKEN');
     if (!apiToken) {
@@ -44,30 +50,50 @@ export function activate(context: vscode.ExtensionContext) {
   };
   checkAuthentication();
 
-  // 2. Command Contribution: Target Problem Context Binding
+  // 4. Command Contribution: Target Problem Context Binding (with dynamic slug conversion & mastery checks)
   const setProblemContextCommand = vscode.commands.registerCommand(
     'sahai.setProblemContext',
     async () => {
+      const apiToken = context.globalState.get<string>('SAHAI_API_TOKEN');
+      if (!apiToken) {
+        await promptForToken(context);
+        return;
+      }
+
       const currentProblem = context.workspaceState.get<string>('SAHAI_PROBLEM_ID') || '';
       const input = await vscode.window.showInputBox({
-        prompt: 'Enter Problem ID (e.g., LC-1 for Two Sum, or SAH-45)',
+        prompt: 'Enter Leetcode Problem Title/Slug (e.g., "Two Sum" or "two-sum")',
         value: currentProblem,
-        placeHolder: 'e.g., LC-1'
+        placeHolder: 'e.g., two-sum'
       });
 
       if (input !== undefined) {
         const cleaned = input.trim();
-        await context.workspaceState.update('SAHAI_PROBLEM_ID', cleaned);
-        vscode.window.showInformationMessage(
-          cleaned ? `🧠 SahAI: Target problem set to [${cleaned}]` : '🧠 SahAI: Target problem cleared'
-        );
-        updateStatusBar(context);
+        if (cleaned) {
+          // Convert to URL-friendly lowercase-dashed slug representation
+          const problemSlug = cleaned.toLowerCase().replace(/\s+/g, '-');
+          await context.workspaceState.update('SAHAI_PROBLEM_ID', problemSlug);
+          
+          vscode.window.showInformationMessage(`🧠 SahAI: Target problem set to [${problemSlug}]`);
+          
+          // Pull dynamic mastery mapping details immediately
+          vscode.window.withProgress({
+            location: vscode.ProgressLocation.Window,
+            title: 'SahAI: Fetching concept mastery...'
+          }, async () => {
+            await updateStatusBar(context);
+          });
+        } else {
+          await context.workspaceState.update('SAHAI_PROBLEM_ID', '');
+          vscode.window.showInformationMessage('🧠 SahAI: Target problem cleared');
+          await updateStatusBar(context);
+        }
       }
     }
   );
   context.subscriptions.push(setProblemContextCommand);
 
-  // 3. Track Active Workspace Editor Document State & Active Timing
+  // 5. Track Active Workspace Editor Document State & Active Timing
   const updateActiveTelemetry = () => {
     const editor = vscode.window.activeTextEditor;
     if (editor && isSupportedLanguage(editor.document.languageId)) {
@@ -95,14 +121,14 @@ export function activate(context: vscode.ExtensionContext) {
   );
   updateActiveTelemetry();
 
-  // 4. In-Memory Time Tracker (Tick active seconds)
+  // 6. In-Memory Time Tracker (Tick active seconds)
   activeInterval = setInterval(() => {
     if (activeDocumentPath && telemetryStore[activeDocumentPath]) {
       telemetryStore[activeDocumentPath].timeSpentSeconds += 1;
     }
   }, 1000);
 
-  // 5. Empathetic Telemetry Text Change Event Listeners
+  // 7. Empathetic Telemetry Text Change Event Listeners
   const textChangeListener = vscode.workspace.onDidChangeTextDocument((event) => {
     const doc = event.document;
     if (!isSupportedLanguage(doc.languageId)) {
@@ -123,12 +149,12 @@ export function activate(context: vscode.ExtensionContext) {
     const metrics = telemetryStore[path];
 
     event.contentChanges.forEach((change) => {
-      // (a) Backspace Detection (empty input text replacing character ranges)
+      // (a) Deletions / Backspace Detection
       if (change.text === '' && change.rangeLength > 0) {
         metrics.backspaceCount += 1;
       }
 
-      // (b) Copy-Paste Detection (inserts exceeding 100 characters)
+      // (b) Empathetic paste nudge triggers
       if (change.text.length > 100) {
         metrics.pasteCharCount += change.text.length;
         vscode.window.showInformationMessage(
@@ -139,7 +165,7 @@ export function activate(context: vscode.ExtensionContext) {
   });
   context.subscriptions.push(textChangeListener);
 
-  // 6. Background Telemetry Ingest Sync Interval (Every 60 seconds)
+  // 8. Background Telemetry Ingest Sync Interval & Mastery Update (Every 60 seconds)
   syncInterval = setInterval(async () => {
     const apiToken = context.globalState.get<string>('SAHAI_API_TOKEN');
     if (!apiToken) {
@@ -149,9 +175,10 @@ export function activate(context: vscode.ExtensionContext) {
     const config = vscode.workspace.getConfiguration('sahaiLens');
     const backendUrl = config.get<string>('backendUrl') || 'https://sahai-api-node-production-f2f3.up.railway.app';
 
+    let didSync = false;
     for (const path of Object.keys(telemetryStore)) {
       const metrics = telemetryStore[path];
-      const problemId = context.workspaceState.get<string>('SAHAI_PROBLEM_ID') || 'GENERAL';
+      const problemId = context.workspaceState.get<string>('SAHAI_PROBLEM_ID') || 'general-dsa';
 
       // Send telemetry if they have actively spent time coding
       if (metrics.timeSpentSeconds > 0 || metrics.pasteCharCount > 0 || metrics.backspaceCount > 0) {
@@ -172,6 +199,7 @@ export function activate(context: vscode.ExtensionContext) {
             }
           });
 
+          didSync = true;
           // Reset accumulators on successful transmission
           metrics.timeSpentSeconds = 0;
           metrics.backspaceCount = 0;
@@ -182,9 +210,14 @@ export function activate(context: vscode.ExtensionContext) {
         }
       }
     }
+
+    // Refresh UI Status bar details with fresh mastery values if synchronized
+    if (didSync) {
+      await updateStatusBar(context);
+    }
   }, 60000);
 
-  // 7. Socratic Diagnostics Hover Collections (Anti-Copilot Inline Queries)
+  // 9. Socratic Diagnostics Hover Collections
   const diagnosticCollection = vscode.languages.createDiagnosticCollection('sahai-socratic');
   context.subscriptions.push(diagnosticCollection);
 
@@ -201,7 +234,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     const problemId = context.workspaceState.get<string>('SAHAI_PROBLEM_ID');
     if (!problemId) {
-      // Clear old diagnostics if no context is set
       diagnosticCollection.set(doc.uri, []);
       return;
     }
@@ -224,7 +256,6 @@ export function activate(context: vscode.ExtensionContext) {
 
         const socraticHint = response.data?.response?.trim() || 'What is the base case check value in your algorithm?';
 
-        // Set diagnostics squiggly line on the first non-empty line of code
         let targetLine = 0;
         for (let i = 0; i < doc.lineCount; i++) {
           if (doc.lineAt(i).text.trim().length > 0) {
@@ -244,15 +275,17 @@ export function activate(context: vscode.ExtensionContext) {
         diagnosticCollection.set(doc.uri, [diagnostic]);
       } catch (err: any) {
         console.warn('[SahAI Lens] Ollama local service not reachable: ', err.message);
-        // Clear collection if offline or fails to prevent outdated warnings
         diagnosticCollection.set(doc.uri, []);
       }
     });
+
+    // Refresh context mastery score on save
+    await updateStatusBar(context);
   });
   context.subscriptions.push(saveListener);
 }
 
-// 8. Auth Token Input Dialog Prompt
+// 10. Auth Token Input Dialog Prompt
 async function promptForToken(context: vscode.ExtensionContext) {
   const token = await vscode.window.showInputBox({
     prompt: 'Paste your Web API Token from the SahAI Dashboard to authenticate',
@@ -264,32 +297,72 @@ async function promptForToken(context: vscode.ExtensionContext) {
     const cleaned = token.trim();
     await context.globalState.update('SAHAI_API_TOKEN', cleaned);
     vscode.window.showInformationMessage('🔑 SahAI Lens: Successfully connected!');
-    updateStatusBar(context);
+    await updateStatusBar(context);
   } else {
     vscode.window.showErrorMessage('🔑 SahAI Lens: API Token input cancelled.');
   }
 }
 
-// Helper to determine status bar content state
-function updateStatusBar(context: vscode.ExtensionContext) {
-  const problemId = context.workspaceState.get<string>('SAHAI_PROBLEM_ID');
+// 11. Async Status Bar Refresher (Fetches user details and expected mastery aggregates)
+async function updateStatusBar(context: vscode.ExtensionContext) {
+  const problemSlug = context.workspaceState.get<string>('SAHAI_PROBLEM_ID');
   const apiToken = context.globalState.get<string>('SAHAI_API_TOKEN');
 
+  const config = vscode.workspace.getConfiguration('sahaiLens');
+  const backendUrl = config.get<string>('backendUrl') || 'https://sahai-api-node-production-f2f3.up.railway.app';
+
+  // State 1: Disconnected
   if (!apiToken) {
-    statusBarItem.text = '$(key) SahAI: Connect Needed';
-    statusBarItem.tooltip = 'Click to connect your SahAI Web API credentials';
-    statusBarItem.show();
+    profileStatusBarItem.text = '$(key) SahAI: Connect Needed';
+    profileStatusBarItem.tooltip = 'Click to connect your SahAI Web API credentials';
+    profileStatusBarItem.show();
+
+    masteryStatusBarItem.hide();
     return;
   }
 
-  if (problemId) {
-    statusBarItem.text = `🧠 SahAI: [${problemId}] Active`;
-    statusBarItem.tooltip = `Currently tracking mastery telemetry on problem ${problemId}. Click to switch context.`;
-  } else {
-    statusBarItem.text = '🧠 SahAI: Select Problem';
-    statusBarItem.tooltip = 'Click to map your coding session to a target DSA concept problem';
+  // State 2: Fetch profile details & update user profile status bar
+  try {
+    const profileRes = await axios.get(`${backendUrl}/api/users/${apiToken}`, {
+      headers: {
+        'Authorization': `Bearer ${apiToken}`
+      }
+    });
+    const userName = profileRes.data?.name || profileRes.data?.username || 'Student';
+    profileStatusBarItem.text = `$(account) SahAI: ${userName}`;
+    profileStatusBarItem.tooltip = `Logged in as ${userName} (${profileRes.data?.academic_stream || 'DSA Program'})`;
+    profileStatusBarItem.show();
+  } catch (err) {
+    profileStatusBarItem.text = '$(account) SahAI: Authenticated';
+    profileStatusBarItem.tooltip = 'Click to reconnect your credentials';
+    profileStatusBarItem.show();
   }
-  statusBarItem.show();
+
+  // State 3: Fetch Mastery calculations
+  if (problemSlug) {
+    try {
+      const contextRes = await axios.get(`${backendUrl}/api/telemetry/vscode-context/${problemSlug}`, {
+        headers: {
+          'Authorization': `Bearer ${apiToken}`
+        }
+      });
+      const title = contextRes.data?.title || problemSlug;
+      const masteryValue = contextRes.data?.average_mastery !== undefined ? contextRes.data.average_mastery : 0.5;
+      const displayPercentage = Math.round(masteryValue * 100);
+
+      masteryStatusBarItem.text = `$(brain) [${title}] Mastery: ${displayPercentage}%`;
+      masteryStatusBarItem.tooltip = `Concept mapping tracks: ${contextRes.data?.mapped_nodes?.join(', ') || 'General'}`;
+      masteryStatusBarItem.show();
+    } catch (err) {
+      masteryStatusBarItem.text = `$(brain) [${problemSlug}] Active`;
+      masteryStatusBarItem.tooltip = 'Unable to sync mastery values from remote gateway.';
+      masteryStatusBarItem.show();
+    }
+  } else {
+    masteryStatusBarItem.text = '$(brain) SahAI: Select Problem';
+    masteryStatusBarItem.tooltip = 'Click to target a LeetCode problem slug';
+    masteryStatusBarItem.show();
+  }
 }
 
 function isSupportedLanguage(langId: string): boolean {
