@@ -212,9 +212,15 @@ function activate(context) {
                 }, async () => {
                     logChannel.appendLine(`[Problem Context] Querying backend metadata for slug: ${problemSlug}`);
                     const contextData = await fetchProblemContextData(apiToken, problemSlug);
-                    if (contextData && contextData.description) {
-                        logChannel.appendLine(`[Problem Context] Description fetched successfully. Inserting comments...`);
-                        insertQuestionCommentHeader(activeEditor, contextData.title, contextData.description);
+                    if (contextData) {
+                        // Cache full context metadata for diagnostic reference on save
+                        const contextMetadataMap = context.workspaceState.get('SAHAI_PROBLEM_CONTEXT_MAP') || {};
+                        contextMetadataMap[activePath] = contextData;
+                        await context.workspaceState.update('SAHAI_PROBLEM_CONTEXT_MAP', contextMetadataMap);
+                        if (contextData.description) {
+                            logChannel.appendLine(`[Problem Context] Description fetched successfully. Inserting comments...`);
+                            insertQuestionCommentHeader(activeEditor, contextData.title, contextData.description);
+                        }
                     }
                     else {
                         logChannel.appendLine(`[Problem Context] Warning: Description not found in response.`);
@@ -226,6 +232,9 @@ function activate(context) {
                 // Clear mapped slug for this file
                 delete problemMap[activePath];
                 await context.workspaceState.update('SAHAI_PROBLEM_MAP', problemMap);
+                const contextMetadataMap = context.workspaceState.get('SAHAI_PROBLEM_CONTEXT_MAP') || {};
+                delete contextMetadataMap[activePath];
+                await context.workspaceState.update('SAHAI_PROBLEM_CONTEXT_MAP', contextMetadataMap);
                 logChannel.appendLine(`[Problem Context] Cleared bind mapping for file: ${activePath}`);
                 vscode.window.showInformationMessage('🧠 SahAI: Target problem cleared for this file.');
                 await updateStatusBar(context);
@@ -349,7 +358,7 @@ function activate(context) {
             await updateStatusBar(context);
         }
     }, 60000);
-    // 10. Socratic Diagnostics Hover Collections
+    // 10. Socratic Diagnostics Hover Collections (With Strict Output Filtering)
     const diagnosticCollection = vscode.languages.createDiagnosticCollection('sahai-socratic');
     context.subscriptions.push(diagnosticCollection);
     const saveListener = vscode.workspace.onDidSaveTextDocument(async (doc) => {
@@ -369,6 +378,11 @@ function activate(context) {
         const config = vscode.workspace.getConfiguration('sahaiLens');
         const ollamaUrl = config.get('ollamaUrl') || 'http://localhost:11434';
         const codeContent = doc.getText();
+        // Pull cached metadata for concept-aware socratic context
+        const contextMetadataMap = context.workspaceState.get('SAHAI_PROBLEM_CONTEXT_MAP') || {};
+        const problemMeta = contextMetadataMap[path] || {};
+        const problemTitle = problemMeta.title || problemId;
+        const evaluatedNodes = problemMeta.mapped_nodes ? problemMeta.mapped_nodes.join(', ') : 'Basic Logic';
         vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: 'SahAI Socratic: Reviewing code logic...',
@@ -376,14 +390,41 @@ function activate(context) {
         }, async () => {
             try {
                 logChannel.appendLine(`[Socratic Local RAG] Document saved. Querying local Ollama model... URL: ${ollamaUrl}/api/generate`);
+                const prompt = `You are a Socratic tutor guiding a student who is writing code to solve the DSA challenge "${problemTitle}" which evaluates topics: [${evaluatedNodes}].
+Here is the student's current code:
+
+${codeContent}
+
+Identify the logical flaws or optimization opportunities. 
+CRITICAL RULE: Under no circumstances should you write, suggest, or include code (no variable assignments, no blocks, no function structures). Do not write explanations.
+Output ONLY a single question ending with a question mark (?) in natural English to guide the student to discover their mistake.
+
+guiding question:`;
                 const payload = {
                     model: 'codegemma:2b',
-                    prompt: `You are an empathetic DSA tutor. The student is solving problem ${problemId}. Here is their code:\n\n${codeContent}\n\nIdentify ONE logical flaw or optimization. DO NOT write code. Provide a 1-sentence Socratic question to make them think.`,
+                    prompt: prompt,
                     stream: false
                 };
                 const response = await axios_1.default.post(`${ollamaUrl}/api/generate`, payload, { timeout: 15000 });
-                const socraticHint = response.data?.response?.trim() || 'What is the base case check value in your algorithm?';
-                logChannel.appendLine(`[Socratic Local RAG] Response: ${socraticHint}`);
+                let socraticHint = response.data?.response?.trim() || 'Have you checked your base case configurations?';
+                logChannel.appendLine(`[Socratic Local RAG] Raw response: ${socraticHint}`);
+                // Self-Healing output parsers: strip any markdown code blocks returned by CodeGemma
+                if (socraticHint.includes('```')) {
+                    socraticHint = socraticHint.replace(/```[\s\S]*?```/g, '').trim();
+                }
+                // Isolate the first guiding question ending in "?"
+                const questionMatch = socraticHint.match(/[^.!?]*\?/);
+                if (questionMatch) {
+                    socraticHint = questionMatch[0].trim();
+                }
+                else {
+                    // Fallback to first complete sentence
+                    const sentenceMatch = socraticHint.match(/[^.!?]*[.!?]/);
+                    if (sentenceMatch) {
+                        socraticHint = sentenceMatch[0].trim();
+                    }
+                }
+                logChannel.appendLine(`[Socratic Local RAG] Filtered output hint: ${socraticHint}`);
                 let targetLine = 0;
                 for (let i = 0; i < doc.lineCount; i++) {
                     if (doc.lineAt(i).text.trim().length > 0) {
