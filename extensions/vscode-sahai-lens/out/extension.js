@@ -33,9 +33,8 @@ const telemetryStore = {};
 let activeDocumentPath = null;
 let activeInterval = null;
 let syncInterval = null;
-// Status Bar Items for authenticated profile (Left), mastery scores (Left-Center), and Mastery context (Right)
+// Dual Status Bar Items for authenticated profile (Left) and Mastery context (Right)
 let profileStatusBarItem;
-let masteryScoreStatusBarItem;
 let masteryStatusBarItem;
 // VS Code Output Channel for real-time debugging visible to the user/judges
 let logChannel;
@@ -137,23 +136,19 @@ function activate(context) {
     profileStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
     profileStatusBarItem.command = 'sahai.connect';
     context.subscriptions.push(profileStatusBarItem);
-    // 2. Initialize Mastery Score Status Bar (Left side next to profile)
-    masteryScoreStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 99);
-    masteryScoreStatusBarItem.tooltip = 'Overall DSA Mastery Score';
-    context.subscriptions.push(masteryScoreStatusBarItem);
-    // 3. Initialize Mastery Context Status Bar (Right side) - Clicking changes file problem target
+    // 2. Initialize Mastery Context Status Bar (Right side) - Clicking changes file problem target
     masteryStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
     masteryStatusBarItem.command = 'sahai.setProblemContext';
     context.subscriptions.push(masteryStatusBarItem);
     // Initial UI refresh
     updateStatusBar(context);
-    // 4. Connect Auth handshakes Command
+    // 3. Connect Auth handshakes Command
     const connectCommand = vscode.commands.registerCommand('sahai.connect', async () => {
         logChannel.appendLine("[Auth] Connect command clicked. Triggering prompt...");
         await promptForToken(context);
     });
     context.subscriptions.push(connectCommand);
-    // 5. Verification warning check
+    // 4. Verification warning check
     const checkAuthentication = async () => {
         const apiToken = context.globalState.get('SAHAI_API_TOKEN');
         logChannel.appendLine(`[Auth] Checking saved token... Presence: ${!!apiToken}`);
@@ -165,7 +160,7 @@ function activate(context) {
         }
     };
     checkAuthentication();
-    // 6. Command Contribution: Target Problem Context Binding (Per-File Basis)
+    // 5. Command Contribution: Target Problem Context Binding (Per-File Basis)
     const setProblemContextCommand = vscode.commands.registerCommand('sahai.setProblemContext', async () => {
         const apiToken = context.globalState.get('SAHAI_API_TOKEN');
         if (!apiToken) {
@@ -544,7 +539,6 @@ async function updateStatusBar(context) {
         profileStatusBarItem.text = '$(key) SahAI: Connect Needed';
         profileStatusBarItem.tooltip = 'Click to connect your SahAI Web API credentials';
         profileStatusBarItem.show();
-        masteryScoreStatusBarItem.hide();
         masteryStatusBarItem.hide();
         return;
     }
@@ -569,37 +563,7 @@ async function updateStatusBar(context) {
         profileStatusBarItem.tooltip = 'Click to reconnect credentials';
         profileStatusBarItem.show();
     }
-    // State 3: Fetch and display Overall Mastery Score (Left side beside Profile)
-    try {
-        const stateUrl = `${backendUrl}/api/users/${apiToken}/cognitive-state`;
-        logChannel.appendLine(`[Status Bar] Fetching cognitive state from: ${stateUrl}`);
-        const stateRes = await axios_1.default.get(stateUrl, {
-            headers: {
-                'Authorization': `Bearer ${apiToken}`
-            }
-        });
-        const states = stateRes.data?.cognitive_state || [];
-        if (states.length > 0) {
-            const sum = states.reduce((acc, val) => acc + (val.expected_mastery || 0.5), 0);
-            const avgOverallMastery = Math.round((sum / states.length) * 100);
-            logChannel.appendLine(`[Status Bar] Calculated overall average mastery: ${avgOverallMastery}%`);
-            masteryScoreStatusBarItem.text = `$(graph) Overall: ${avgOverallMastery}%`;
-            masteryScoreStatusBarItem.tooltip = `Overall DSA curriculum mastery across all ${states.length} active concept areas.`;
-            masteryScoreStatusBarItem.show();
-        }
-        else {
-            masteryScoreStatusBarItem.text = `$(graph) Overall: 50%`;
-            masteryScoreStatusBarItem.tooltip = 'Start solving problems to update overall mastery.';
-            masteryScoreStatusBarItem.show();
-        }
-    }
-    catch (err) {
-        logChannel.appendLine(`[Status Bar] ERROR fetching cognitive states: ${err.message}`);
-        masteryScoreStatusBarItem.text = `$(graph) Overall: 50%`;
-        masteryScoreStatusBarItem.tooltip = 'Start solving problems to update overall mastery.';
-        masteryScoreStatusBarItem.show();
-    }
-    // State 4: Fetch and display active file problem expected mastery (Right side)
+    // State 3: Fetch and display active file problem expected mastery (Right side)
     const activeEditor = vscode.window.activeTextEditor;
     if (activeEditor) {
         const activePath = activeEditor.document.uri.fsPath;
