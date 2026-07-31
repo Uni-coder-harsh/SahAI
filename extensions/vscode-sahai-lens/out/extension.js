@@ -377,7 +377,13 @@ function activate(context) {
         }
         const config = vscode.workspace.getConfiguration('sahaiLens');
         const ollamaUrl = config.get('ollamaUrl') || 'http://localhost:11434';
-        const codeContent = doc.getText();
+        let cleanCode = doc.getText();
+        const lines = cleanCode.split('\n');
+        const filteredLines = lines.filter(line => {
+            const trimmed = line.trim();
+            return !trimmed.startsWith('# ===') && !trimmed.startsWith('// ===') && !trimmed.startsWith('# LeetCode') && !trimmed.startsWith('// LeetCode');
+        });
+        cleanCode = filteredLines.join('\n').trim();
         // Pull cached metadata for concept-aware socratic context
         const contextMetadataMap = context.workspaceState.get('SAHAI_PROBLEM_CONTEXT_MAP') || {};
         const problemMeta = contextMetadataMap[path] || {};
@@ -394,13 +400,52 @@ function activate(context) {
 You are an empathetic computer science teacher. A student is trying to solve the coding problem "${problemTitle}" (topics: ${evaluatedNodes}).
 Here is their code:
 
-${codeContent}
+${cleanCode}
 
 Analyze their code and identify logical flaws or conceptual issues.
-Write ONLY a single sentence containing a Socratic guiding question.
-Do NOT write any code, do NOT provide solutions, do NOT write explanations.
+Write ONLY a single sentence containing a Socratic guiding question. Do NOT write any code, do NOT provide solutions, do NOT write explanations.
 Your response MUST end with a question mark (?).
-Do not output prompt instructions or headers.
+
+---
+Example 1:
+Problem: Two Sum (topics: Arrays)
+Code:
+for i in range(len(nums)):
+    for j in range(len(nums)):
+        if nums[i] + nums[j] == target:
+            return [i, j]
+Question: If you pair an element with itself, does it satisfy the requirement of using two distinct elements?
+
+Example 2:
+Problem: Valid Parentheses (topics: Stack)
+Code:
+function isValid(s) {
+    let stack = [];
+    for (let char of s) {
+        if (char === '(') stack.push(')');
+        else if (stack.pop() !== char) return false;
+        else return true;
+    }
+}
+Question: Why does returning true inside the loop prevent you from checking the remaining characters of the input string?
+
+Example 3:
+Problem: duplicate-numbers-xor (topics: Bitwise Operators)
+Code:
+class Solution:
+    def duplicateNumbersXOR(self, nums: List[int]) -> int:
+        seen = set()
+        result = 0
+        for num in nums:
+            if num in seen:
+                result += num
+            else:
+                seen.add(num)
+        return result
+Question: Are you combining the duplicate numbers using addition, or does the problem require a bitwise operator?
+---
+
+Do not output prompt instructions, example structures, or explanations. Respond with ONLY one guiding question.
 </instruction>
 
 Question:`;
@@ -418,6 +463,9 @@ Question:`;
                 socraticHint = socraticHint.replace(/instruction>?/gi, '').trim();
                 socraticHint = socraticHint.replace(/<\/instruction>?/gi, '').trim();
                 socraticHint = socraticHint.replace(/<instruction>?/gi, '').trim();
+                socraticHint = socraticHint.replace(/few-shot example \d+:?/gi, '').trim();
+                socraticHint = socraticHint.replace(/example \d+:?/gi, '').trim();
+                socraticHint = socraticHint.replace(/problem:.*?code:.*?question:/gsi, '').trim();
                 // Self-Healing output parsers: strip any markdown code blocks returned by CodeGemma
                 if (socraticHint.includes('```')) {
                     socraticHint = socraticHint.replace(/```[\s\S]*?```/g, '').trim();
