@@ -33,8 +33,9 @@ const telemetryStore = {};
 let activeDocumentPath = null;
 let activeInterval = null;
 let syncInterval = null;
-// Dual Status Bar Items for authenticated profile (Left) and Mastery context (Right)
+// Status Bar Items for authenticated profile (Left), mastery scores (Left-Center), and Mastery context (Right)
 let profileStatusBarItem;
+let masteryScoreStatusBarItem;
 let masteryStatusBarItem;
 // VS Code Output Channel for real-time debugging visible to the user/judges
 let logChannel;
@@ -136,19 +137,23 @@ function activate(context) {
     profileStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
     profileStatusBarItem.command = 'sahai.connect';
     context.subscriptions.push(profileStatusBarItem);
-    // 2. Initialize Mastery Context Status Bar (Right side) - Clicking changes file problem target
+    // 2. Initialize Mastery Score Status Bar (Left side next to profile)
+    masteryScoreStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 99);
+    masteryScoreStatusBarItem.tooltip = 'Overall DSA Mastery Score';
+    context.subscriptions.push(masteryScoreStatusBarItem);
+    // 3. Initialize Mastery Context Status Bar (Right side) - Clicking changes file problem target
     masteryStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
     masteryStatusBarItem.command = 'sahai.setProblemContext';
     context.subscriptions.push(masteryStatusBarItem);
     // Initial UI refresh
     updateStatusBar(context);
-    // 3. Connect Auth handshakes Command
+    // 4. Connect Auth handshakes Command
     const connectCommand = vscode.commands.registerCommand('sahai.connect', async () => {
         logChannel.appendLine("[Auth] Connect command clicked. Triggering prompt...");
         await promptForToken(context);
     });
     context.subscriptions.push(connectCommand);
-    // 4. Verification warning check
+    // 5. Verification warning check
     const checkAuthentication = async () => {
         const apiToken = context.globalState.get('SAHAI_API_TOKEN');
         logChannel.appendLine(`[Auth] Checking saved token... Presence: ${!!apiToken}`);
@@ -160,7 +165,7 @@ function activate(context) {
         }
     };
     checkAuthentication();
-    // 5. Command Contribution: Target Problem Context Binding (Per-File Basis)
+    // 6. Command Contribution: Target Problem Context Binding (Per-File Basis)
     const setProblemContextCommand = vscode.commands.registerCommand('sahai.setProblemContext', async () => {
         const apiToken = context.globalState.get('SAHAI_API_TOKEN');
         if (!apiToken) {
@@ -242,7 +247,7 @@ function activate(context) {
         }
     });
     context.subscriptions.push(setProblemContextCommand);
-    // 6. Track Active Workspace Editor Document State & Active Timing
+    // 7. Track Active Workspace Editor Document State & Active Timing
     const updateActiveTelemetry = () => {
         const editor = vscode.window.activeTextEditor;
         if (editor && isSupportedLanguage(editor.document.languageId)) {
@@ -269,13 +274,13 @@ function activate(context) {
         updateStatusBar(context); // Update Status Bars immediately when active tab changes
     }));
     updateActiveTelemetry();
-    // 7. In-Memory Time Tracker (Tick active seconds)
+    // 8. In-Memory Time Tracker (Tick active seconds)
     activeInterval = setInterval(() => {
         if (activeDocumentPath && telemetryStore[activeDocumentPath]) {
             telemetryStore[activeDocumentPath].timeSpentSeconds += 1;
         }
     }, 1000);
-    // 8. Empathetic Telemetry Text Change Event Listeners
+    // 9. Empathetic Telemetry Text Change Event Listeners
     const textChangeListener = vscode.workspace.onDidChangeTextDocument((event) => {
         const doc = event.document;
         if (!isSupportedLanguage(doc.languageId)) {
@@ -306,7 +311,7 @@ function activate(context) {
         });
     });
     context.subscriptions.push(textChangeListener);
-    // 9. Background Telemetry Ingest Sync Interval (Every 60 seconds)
+    // 10. Background Telemetry Ingest Sync Interval (Every 60 seconds)
     syncInterval = setInterval(async () => {
         const apiToken = context.globalState.get('SAHAI_API_TOKEN');
         if (!apiToken) {
@@ -358,7 +363,7 @@ function activate(context) {
             await updateStatusBar(context);
         }
     }, 60000);
-    // 10. Socratic Diagnostics Hover Collections (With Strict Output Filtering)
+    // 11. Socratic Diagnostics Hover Collections (With Stricter Prompt Format and Cleaners)
     const diagnosticCollection = vscode.languages.createDiagnosticCollection('sahai-socratic');
     context.subscriptions.push(diagnosticCollection);
     const saveListener = vscode.workspace.onDidSaveTextDocument(async (doc) => {
@@ -390,16 +395,20 @@ function activate(context) {
         }, async () => {
             try {
                 logChannel.appendLine(`[Socratic Local RAG] Document saved. Querying local Ollama model... URL: ${ollamaUrl}/api/generate`);
-                const prompt = `You are a Socratic tutor guiding a student who is writing code to solve the DSA challenge "${problemTitle}" which evaluates topics: [${evaluatedNodes}].
-Here is the student's current code:
+                const prompt = `<instruction>
+You are an empathetic computer science teacher. A student is trying to solve the coding problem "${problemTitle}" (topics: ${evaluatedNodes}).
+Here is their code:
 
 ${codeContent}
 
-Identify the logical flaws or optimization opportunities. 
-CRITICAL RULE: Under no circumstances should you write, suggest, or include code (no variable assignments, no blocks, no function structures). Do not write explanations.
-Output ONLY a single question ending with a question mark (?) in natural English to guide the student to discover their mistake.
+Analyze their code and identify logical flaws or conceptual issues.
+Write ONLY a single sentence containing a Socratic guiding question.
+Do NOT write any code, do NOT provide solutions, do NOT write explanations.
+Your response MUST end with a question mark (?).
+Do not output prompt instructions or headers.
+</instruction>
 
-guiding question:`;
+Question:`;
                 const payload = {
                     model: 'codegemma:2b',
                     prompt: prompt,
@@ -408,6 +417,12 @@ guiding question:`;
                 const response = await axios_1.default.post(`${ollamaUrl}/api/generate`, payload, { timeout: 15000 });
                 let socraticHint = response.data?.response?.trim() || 'Have you checked your base case configurations?';
                 logChannel.appendLine(`[Socratic Local RAG] Raw response: ${socraticHint}`);
+                // Clean up leaked instruction prompts or header templates
+                socraticHint = socraticHint.replace(/identify the logical flaws or optimization opportunities\.?/gi, '').trim();
+                socraticHint = socraticHint.replace(/student's solution:?/gi, '').trim();
+                socraticHint = socraticHint.replace(/instruction>?/gi, '').trim();
+                socraticHint = socraticHint.replace(/<\/instruction>?/gi, '').trim();
+                socraticHint = socraticHint.replace(/<instruction>?/gi, '').trim();
                 // Self-Healing output parsers: strip any markdown code blocks returned by CodeGemma
                 if (socraticHint.includes('```')) {
                     socraticHint = socraticHint.replace(/```[\s\S]*?```/g, '').trim();
@@ -447,7 +462,7 @@ guiding question:`;
     context.subscriptions.push(saveListener);
 }
 exports.activate = activate;
-// 11. Fetch Context data helper
+// 12. Fetch Context data helper
 async function fetchProblemContextData(apiToken, problemSlug) {
     const config = vscode.workspace.getConfiguration('sahaiLens');
     const backendUrl = config.get('backendUrl') || 'https://sahai-api-node-production-f2f3.up.railway.app';
@@ -467,7 +482,7 @@ async function fetchProblemContextData(apiToken, problemSlug) {
         return null;
     }
 }
-// 12. Format and insert question markdown description as comments at top of file
+// 13. Format and insert question markdown description as comments at top of file
 function insertQuestionCommentHeader(editor, title, description) {
     const doc = editor.document;
     const langId = doc.languageId;
@@ -499,7 +514,7 @@ function insertQuestionCommentHeader(editor, title, description) {
         editBuilder.insert(new vscode.Position(0, 0), header);
     });
 }
-// 13. Auth Token Input Dialog Prompt
+// 14. Auth Token Input Dialog Prompt
 async function promptForToken(context) {
     const token = await vscode.window.showInputBox({
         prompt: 'Paste your Web API Token from the SahAI Dashboard to authenticate',
@@ -518,7 +533,7 @@ async function promptForToken(context) {
         vscode.window.showErrorMessage('🔑 SahAI Lens: API Token input cancelled.');
     }
 }
-// 14. Async Status Bar Refresher (Updates per-file context and user details)
+// 15. Async Status Bar Refresher (Updates per-file context and user details)
 async function updateStatusBar(context) {
     const apiToken = context.globalState.get('SAHAI_API_TOKEN');
     const config = vscode.workspace.getConfiguration('sahaiLens');
@@ -529,6 +544,7 @@ async function updateStatusBar(context) {
         profileStatusBarItem.text = '$(key) SahAI: Connect Needed';
         profileStatusBarItem.tooltip = 'Click to connect your SahAI Web API credentials';
         profileStatusBarItem.show();
+        masteryScoreStatusBarItem.hide();
         masteryStatusBarItem.hide();
         return;
     }
@@ -553,7 +569,37 @@ async function updateStatusBar(context) {
         profileStatusBarItem.tooltip = 'Click to reconnect credentials';
         profileStatusBarItem.show();
     }
-    // State 3: Fetch and display active file problem expected mastery (Right side)
+    // State 3: Fetch and display Overall Mastery Score (Left side beside Profile)
+    try {
+        const stateUrl = `${backendUrl}/api/users/${apiToken}/cognitive-state`;
+        logChannel.appendLine(`[Status Bar] Fetching cognitive state from: ${stateUrl}`);
+        const stateRes = await axios_1.default.get(stateUrl, {
+            headers: {
+                'Authorization': `Bearer ${apiToken}`
+            }
+        });
+        const states = stateRes.data?.cognitive_state || [];
+        if (states.length > 0) {
+            const sum = states.reduce((acc, val) => acc + (val.expected_mastery || 0.5), 0);
+            const avgOverallMastery = Math.round((sum / states.length) * 100);
+            logChannel.appendLine(`[Status Bar] Calculated overall average mastery: ${avgOverallMastery}%`);
+            masteryScoreStatusBarItem.text = `$(graph) Overall: ${avgOverallMastery}%`;
+            masteryScoreStatusBarItem.tooltip = `Overall DSA curriculum mastery across all ${states.length} active concept areas.`;
+            masteryScoreStatusBarItem.show();
+        }
+        else {
+            masteryScoreStatusBarItem.text = `$(graph) Overall: 50%`;
+            masteryScoreStatusBarItem.tooltip = 'Start solving problems to update overall mastery.';
+            masteryScoreStatusBarItem.show();
+        }
+    }
+    catch (err) {
+        logChannel.appendLine(`[Status Bar] ERROR fetching cognitive states: ${err.message}`);
+        masteryScoreStatusBarItem.text = `$(graph) Overall: 50%`;
+        masteryScoreStatusBarItem.tooltip = 'Start solving problems to update overall mastery.';
+        masteryScoreStatusBarItem.show();
+    }
+    // State 4: Fetch and display active file problem expected mastery (Right side)
     const activeEditor = vscode.window.activeTextEditor;
     if (activeEditor) {
         const activePath = activeEditor.document.uri.fsPath;
